@@ -1,0 +1,42 @@
+:root {
+    --cor-primaria:    #000050;
+    --cor-secundaria:  #FFB300;
+    --cor-alerta:      #FEE262;
+    --cor-fundo:       #242424;
+    --cor-texto:       #2C3E50;
+    --fonte-principal: "Segoe UI", Arial, sans-serif;
+    --raio-borda:      6px;
+ 
+    --cor-ia-primaria: #001C39;
+    --cor-ia-destaque: #120500;
+    --cor-card-fundo:  #000945;
+    --sombra-card:     0 2px 8px rgba(0,0,0,0.08);
+}
+ 
+body {
+    font-family: var(--fonte-principal);
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+    margin: 0;
+}
+ 
+header {
+    background-color: var(--cor-ia-primaria);
+    color: #fff;
+    padding: 1rem 2rem;
+}
+ 
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    padding: 2rem;
+}
+ 
+.card {
+    background: var(--cor-card-fundo);
+    border-radius: var(--raio-borda);
+    box-shadow: var(--sombra-card);
+    padding: 1.5rem;
+}
+
