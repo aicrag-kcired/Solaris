@@ -4,6 +4,9 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
+from database import Base, engine
+import models
+
 from routes.clientes import router as clientes_router
 from routes.simulacoes import router as simulacoes_router
 from routes.cadastros import router as cadastros_router
@@ -20,6 +23,15 @@ app = FastAPI(
     version="0.6.0",
     description="API do projeto Solaris com assistente virtual."
 )
+
+
+# ==========================================
+# BANCO DE DADOS
+# ==========================================
+
+@app.on_event("startup")
+def criar_tabelas():
+    Base.metadata.create_all(bind=engine)
 
 
 # ==========================================
