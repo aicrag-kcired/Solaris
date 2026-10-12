@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fffaf1">
+  <meta name="description" content="Solaris: um projeto educacional sobre energia solar, tecnologia e inovação.">
+  <title>Solaris | Iluminando seu futuro</title>
+  <link rel="icon" href="assets/logo-solaris.png" type="image/png">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <button class="icon-btn menu-toggle" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h11"/></svg>
+      </button>
+      <a class="header-logo" href="#/inicio" aria-label="Solaris, ir para início"><img src="assets/logo-solaris.png" alt="Solaris, girassol laranja"></a>
+      <div class="header-actions">
+        <button class="icon-btn cart-shortcut" id="cart-shortcut" aria-label="Abrir carrinho">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.3 11.3a2 2 0 0 0 2 1.7h8.8a2 2 0 0 0 2-1.6L22 8H6"/><circle cx="10" cy="21" r="1"/><circle cx="19" cy="21" r="1"/></svg>
+          <span id="cart-count" class="cart-count" hidden>0</span>
+        </button>
+        <button class="account-pill" id="account-shortcut">Entrar <span aria-hidden="true">↗</span></button>
+      </div>
+    </div>
+  </header>
+  <div class="menu-overlay" id="menu-overlay" hidden></div>
+  <aside class="sidebar" id="sidebar" aria-label="Menu principal" aria-hidden="true" inert>
+    <div class="sidebar-top"><img src="assets/logo-solaris.png" alt="Solaris"><button class="icon-btn" id="menu-close" aria-label="Fechar menu">×</button></div>
+    <p class="sidebar-label">EXPLORE O SOLARIS</p>
+    <nav id="main-navigation">
+      <a href="#/inicio" data-page="inicio"><span>⌂</span> Início <b>↗</b></a>
+      <a href="#/sobre" data-page="sobre"><span>✺</span> Sobre o projeto <b>↗</b></a>
+      <a href="#/loja" data-page="loja"><span>▣</span> Loja Solaris <b>↗</b></a>
+      <a href="#/simulador" data-page="simulador"><span>◫</span> Simulador <b>↗</b></a>
+      <a href="#/ia" data-page="ia"><span>✳</span> Solaris IA <b>↗</b></a>
+      <a href="#/conta" data-page="conta"><span>◯</span> Minha conta <b>↗</b></a>
+    </nav>
+    <div class="sidebar-bottom"><div class="sidebar-sun">✺</div><strong>O futuro é solar.</strong><p>Tecnologia, energia limpa e novas possibilidades.</p><small>Projeto escolar • Em desenvolvimento</small></div>
+  </aside>
+  <main id="conteudo" tabindex="-1"></main>
+  <footer class="site-footer"><div class="footer-main"><img src="assets/logo-solaris.png" alt="Solaris"><p>Iluminando ideias. Inspirando o amanhã.</p></div><div class="footer-links"><a href="#/sobre">Nosso projeto</a><a href="#/loja">Loja</a><a href="#/simulador">Simulador</a><a href="#/ia">Solaris IA</a></div><div class="footer-bottom"><span>© Solaris • Projeto educacional</span><span>Feito com energia e inovação ☀</span></div></footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

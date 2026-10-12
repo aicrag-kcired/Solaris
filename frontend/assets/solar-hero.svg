@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 620" role="img" aria-label="Ilustração de painéis solares sob o sol">
+<defs><linearGradient id="sky" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff9e9"/><stop offset="1" stop-color="#ffedc6"/></linearGradient><linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#193c64"/><stop offset="1" stop-color="#0a1a37"/></linearGradient><filter id="shadow"><feDropShadow dx="0" dy="19" stdDeviation="18" flood-color="#6e4824" flood-opacity=".19"/></filter></defs>
+<rect width="800" height="620" rx="40" fill="url(#sky)"/>
+<circle cx="560" cy="190" r="91" fill="#ffcb42" opacity=".18"/><circle cx="560" cy="190" r="67" fill="#f7ad24"/><circle cx="560" cy="190" r="85" fill="none" stroke="#f8c65b" stroke-width="2" stroke-dasharray="8 18"/>
+<g stroke="#e8b14a" stroke-width="4" stroke-linecap="round" opacity=".55"><path d="M560 70v-20M560 309v21M440 190h-21M680 190h21M475 105l-14-14M645 275l14 14M645 105l14-14M475 275l-14 14"/></g>
+<path d="M0 470c135-60 235-52 362-20 165 42 269 8 438-45v215H0z" fill="#f1e5c9"/><path d="M0 540c210-90 420 80 800-48v128H0z" fill="#e7d4ac" opacity=".75"/>
+<g filter="url(#shadow)" transform="translate(93 243)"><path d="M48 220l355 57 205-134-351-54z" fill="#25394c" opacity=".2"/><path d="M110 215l3 124M478 185l-2 123" stroke="#5d6470" stroke-width="12" stroke-linecap="round"/><path d="M25 102l375 68 160-100-370-62z" fill="url(#panel)" stroke="#e4edf0" stroke-width="13" stroke-linejoin="round"/><path d="M68 105l372 66M111 78l372 67M155 51l370 66M102 112l165-94M190 127l165-94M280 143l165-94M370 158l165-94" stroke="#88b5d4" stroke-width="3" opacity=".85"/><path d="M25 102l375 68 160-100" fill="none" stroke="#fff" stroke-width="6" opacity=".8"/></g>
+<g fill="#e2a338" opacity=".7"><path d="M64 492l9-26 8 26zM682 482l9-26 8 26zM731 511l7-20 6 20z"/></g>
+<rect x="33" y="28" width="155" height="41" rx="20" fill="#fff" opacity=".93"/><circle cx="58" cy="48" r="7" fill="#f9b53a"/><text x="74" y="54" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#4d3c1e">ENERGIA SOLAR</text>
+</svg>

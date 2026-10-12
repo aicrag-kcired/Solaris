@@ -110,3 +110,12 @@ class Tecnico(Base):
     id_tecnico = Column(Integer, primary_key=True, autoincrement=True)
 
     local_instalacao = Column(String, nullable=False)
+    
+class Usuario(Base):
+    __tablename__ = "usuarios_solaris"
+
+    id_usuario = Column(Integer, primary_key=True, index=True)
+    nome = Column(String(100), nullable=False)
+    email = Column(String(255), unique=True, nullable=False)
+    senha_hash = Column(String(255), nullable=False)
+    tipo_usuario = Column(String(20), nullable=False, default="cliente")

@@ -1,13 +1,18 @@
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 
 from database import engine
 from models import Cliente, Simulacao
 from schemas import SimulacaoSchema
 from calculos import calcular_economia
+from routes.clientes import exigir_administrador
 
-router = APIRouter()
+
+# Protege todas as rotas deste arquivo.
+router = APIRouter(
+    dependencies=[Depends(exigir_administrador)]
+)
 
 
 @router.get("/simulacoes")
@@ -27,7 +32,9 @@ def listar_simulacoes():
             resultado.append({
                 "id_simulacao": simulacao.id_simulacao,
                 "id_cliente": simulacao.id_cliente,
-                "nome_cliente": cliente.nome_cliente if cliente else None,
+                "nome_cliente": (
+                    cliente.nome_cliente if cliente else None
+                ),
                 "consumo_energia": simulacao.consumo_energia,
                 "valor_conta_energia": simulacao.valor_conta_energia,
                 "economia_estimada": simulacao.economia_estimada,
@@ -36,16 +43,22 @@ def listar_simulacoes():
                 "id_usuario": simulacao.id_usuario,
                 "valor_economia_mensal": simulacao.valor_economia_mensal,
                 "valor_economia_anual": simulacao.valor_economia_anual,
-                "percentual_economia_primeiro_mes": simulacao.percentual_economia_primeiro_mes
+                "percentual_economia_primeiro_mes": (
+                    simulacao.percentual_economia_primeiro_mes
+                )
             })
 
         return resultado
 
 
-@router.post("/simulacoes")
+@router.post("/simulacoes", status_code=201)
 def cadastrar_simulacao(dados: SimulacaoSchema):
     with Session(engine) as session:
-        cliente = session.get(Cliente, dados.id_cliente)
+
+        cliente = session.get(
+            Cliente,
+            dados.id_cliente
+        )
 
         if cliente is None:
             raise HTTPException(
@@ -53,17 +66,21 @@ def cadastrar_simulacao(dados: SimulacaoSchema):
                 detail="Cliente não encontrado"
             )
 
-        # Calcula automaticamente a economia estimada
-        calculos = calcular_economia(dados.valor_conta_energia)
+        # Calcula automaticamente a economia estimada.
+        calculos = calcular_economia(
+            dados.valor_conta_energia
+        )
 
-        # Reúne os dados enviados pelo usuário
+        # Reúne os dados enviados.
         dados_simulacao = dados.model_dump()
 
-        # Substitui os valores pelos cálculos do Solaris
+        # Adiciona os cálculos do Solaris.
         dados_simulacao.update(calculos)
 
-        # Cria a simulação com os resultados calculados
-        nova_simulacao = Simulacao(**dados_simulacao)
+        # Cria a simulação.
+        nova_simulacao = Simulacao(
+            **dados_simulacao
+        )
 
         session.add(nova_simulacao)
         session.commit()
@@ -73,9 +90,17 @@ def cadastrar_simulacao(dados: SimulacaoSchema):
             "id_simulacao": nova_simulacao.id_simulacao,
             "id_cliente": nova_simulacao.id_cliente,
             "nome_cliente": cliente.nome_cliente,
-            "economia_estimada": nova_simulacao.economia_estimada,
-            "valor_economia_mensal": nova_simulacao.valor_economia_mensal,
-            "valor_economia_anual": nova_simulacao.valor_economia_anual,
-            "percentual_economia_primeiro_mes": nova_simulacao.percentual_economia_primeiro_mes,
+            "economia_estimada": (
+                nova_simulacao.economia_estimada
+            ),
+            "valor_economia_mensal": (
+                nova_simulacao.valor_economia_mensal
+            ),
+            "valor_economia_anual": (
+                nova_simulacao.valor_economia_anual
+            ),
+            "percentual_economia_primeiro_mes": (
+                nova_simulacao.percentual_economia_primeiro_mes
+            ),
             "mensagem": "Simulação cadastrada com sucesso!"
         }
