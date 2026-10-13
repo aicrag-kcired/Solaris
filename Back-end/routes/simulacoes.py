@@ -1,9 +1,11 @@
+
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.orm import Session
 
 from database import engine
 from models import Cliente, Simulacao
 from schemas import SimulacaoSchema
+from calculos import calcular_economia
 
 router = APIRouter()
 
@@ -16,7 +18,11 @@ def listar_simulacoes():
         resultado = []
 
         for simulacao in simulacoes:
-            cliente = session.get(Cliente, simulacao.id_cliente) if simulacao.id_cliente is not None else None
+            cliente = (
+                session.get(Cliente, simulacao.id_cliente)
+                if simulacao.id_cliente is not None
+                else None
+            )
 
             resultado.append({
                 "id_simulacao": simulacao.id_simulacao,
@@ -47,7 +53,17 @@ def cadastrar_simulacao(dados: SimulacaoSchema):
                 detail="Cliente não encontrado"
             )
 
-        nova_simulacao = Simulacao(**dados.model_dump())
+        # Calcula automaticamente a economia estimada
+        calculos = calcular_economia(dados.valor_conta_energia)
+
+        # Reúne os dados enviados pelo usuário
+        dados_simulacao = dados.model_dump()
+
+        # Substitui os valores pelos cálculos do Solaris
+        dados_simulacao.update(calculos)
+
+        # Cria a simulação com os resultados calculados
+        nova_simulacao = Simulacao(**dados_simulacao)
 
         session.add(nova_simulacao)
         session.commit()
@@ -57,5 +73,9 @@ def cadastrar_simulacao(dados: SimulacaoSchema):
             "id_simulacao": nova_simulacao.id_simulacao,
             "id_cliente": nova_simulacao.id_cliente,
             "nome_cliente": cliente.nome_cliente,
+            "economia_estimada": nova_simulacao.economia_estimada,
+            "valor_economia_mensal": nova_simulacao.valor_economia_mensal,
+            "valor_economia_anual": nova_simulacao.valor_economia_anual,
+            "percentual_economia_primeiro_mes": nova_simulacao.percentual_economia_primeiro_mes,
             "mensagem": "Simulação cadastrada com sucesso!"
         }

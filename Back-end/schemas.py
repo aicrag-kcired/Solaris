@@ -18,10 +18,6 @@ class SimulacaoSchema(BaseModel):
     id_cliente: int
     consumo_energia: float
     valor_conta_energia: float
-    economia_estimada: float
     data_simulacao: datetime
     financiamento: float
     id_usuario: str
-    valor_economia_mensal: float
-    valor_economia_anual: float
-    percentual_economia_primeiro_mes: float
