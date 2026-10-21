@@ -1,15 +1,20 @@
 import os
-
+from pathlib import Path
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase
+from supabase import Client, create_client
 
-load_dotenv()
+# Localiza e lê o arquivo .env
+caminho_env = Path(__file__).with_name(".env")
+load_dotenv(caminho_env, override=True)
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+# Pega a URL e a chave do .env
+url = os.getenv("SUPABASE_URL")
+chave = os.getenv("SUPABASE_KEY")
 
-engine = create_engine(DATABASE_URL)
+if not url or not chave:
+    raise RuntimeError(
+        "Configure SUPABASE_URL e SUPABASE_KEY no arquivo .env."
+    )
 
-
-class Base(DeclarativeBase):
-    pass
+# Cria a conexão com o Supabase
+supabase: Client = create_client(url, chave)

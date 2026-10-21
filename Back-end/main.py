@@ -1,110 +1,62 @@
 
-from pathlib import Path
+import logging
 
-from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from httpx import RequestError
+from postgrest.exceptions import APIError
 
-from database import Base, engine
-import models
+from controller.clientes import router as clientes_router
+from controller.tecnico import router as tecnico_router
+from controller.simulacao import router as simulacao_router
+from controller.financiamento import router as financiamento_router
+from controller.pagamento import router as pagamento_router
+from controller.relatorio import router as relatorio_router
+from controller.paineis import router as paineis_router
+from controller.instalacao import router as instalacao_router
+from controller.chatbot import router as chatbot_router
 
-from routes.clientes import router as clientes_router
-from routes.simulacoes import router as simulacoes_router
-from routes.cadastros import router as cadastros_router
-from routes.servicos import router as servicos_router
-from routes.auth import router as auth_router
-from routes.site_auth import router as site_auth_router
-from routes import solaris_ia
-
-from calculos import router as simulador_publico_router
-
+logger = logging.getLogger("uvicorn.error")
 
 app = FastAPI(
-    title="Solaris API",
-    version="0.6.0",
-    description="API do projeto Solaris com assistente virtual."
+    title="Solaris - API",
+    description="Backend do Solaris com FastAPI e Supabase por HTTPS."
 )
 
-
-# ==========================================
-# BANCO DE DADOS
-# ==========================================
-
-@app.on_event("startup")
-def criar_tabelas():
-    Base.metadata.create_all(bind=engine)
-
-
-# ==========================================
-# ROTAS DO BACKEND
-# ==========================================
-
-app.include_router(
-    clientes_router,
-    tags=["Clientes"]
-)
-
-app.include_router(
-    simulacoes_router,
-    tags=["Simulações"]
-)
-
-app.include_router(cadastros_router)
-app.include_router(servicos_router)
-app.include_router(auth_router)
-app.include_router(site_auth_router)
+app.include_router(clientes_router)
+app.include_router(tecnico_router)
+app.include_router(simulacao_router)
+app.include_router(financiamento_router)
+app.include_router(pagamento_router)
+app.include_router(relatorio_router)
+app.include_router(paineis_router)
+app.include_router(instalacao_router)
+app.include_router(chatbot_router)
 
 
-# ==========================================
-# SIMULADOR PÚBLICO
-# ==========================================
-
-app.include_router(
-    simulador_publico_router
-)
-
-
-# ==========================================
-# SOLARIS IA 2.0
-# ==========================================
-
-app.include_router(
-    solaris_ia.router
-)
+@app.exception_handler(APIError)
+async def tratar_erro_supabase(request: Request, erro: APIError):
+    logger.error("Erro na operação do Supabase: %s", erro)
+    return JSONResponse(
+        status_code=502,
+        content={
+            "detail": (
+                "O Supabase recusou a operação. "
+                "Confira a mensagem no terminal."
+            )
+        },
+    )
 
 
-# ==========================================
-# SISTEMA
-# ==========================================
-
-@app.get("/", tags=["Sistema"])
-def inicio():
-    return {
-        "mensagem": "Solaris funcionando!",
-        "versao": "0.6.0",
-        "ia": "Solaris IA 2.0"
-    }
-
-
-@app.get("/saude", tags=["Sistema"])
-def saude():
-    return {
-        "status": "online"
-    }
-
-
-# ==========================================
-# FRONTEND DO SOLARIS
-# ==========================================
-
-frontend_dir = (
-    Path(__file__).resolve().parent.parent / "frontend"
-)
-
-app.mount(
-    "/site",
-    StaticFiles(
-        directory=frontend_dir,
-        html=True
-    ),
-    name="frontend"
-)
+@app.exception_handler(RequestError)
+async def tratar_erro_rede(request: Request, erro: RequestError):
+    logger.error("Falha de comunicação: %s", type(erro).__name__)
+    return JSONResponse(
+        status_code=503,
+        content={
+            "detail": (
+                "Não foi possível acessar o Supabase. "
+                "Verifique a conexão com a internet."
+            )
+        },
+    )
