@@ -27,4 +27,4 @@ class ClienteEntrada(BaseModel):
 
 class ClienteSaida(ClienteEntrada):
     id_cliente: int
-    data_de_cadastro_cliente: datetime
+
