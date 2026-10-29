@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loja | Solaris</title>
+  <link rel="stylesheet" href="../static/style.css">
+  <script src="../js/menu.js" defer></script>
+</head>
+<body>
+  <header class="cabecalho">
+    <div class="container">
+      <button id="botao-menu" class="menu-btn" type="button" aria-label="Abrir menu"
+              aria-expanded="false" aria-controls="menu-lateral">
+        <span class="icone" aria-hidden="true">&#9776;</span> menu
+      </button>
+      <a class="marca logo" href="inicio.html" aria-label="Solaris">S<svg viewBox="0 0 100 100" aria-hidden="true">
+          <g fill="#ffa200">
+            <ellipse cx="50" cy="15" rx="8" ry="14"/>
+            <ellipse cx="50" cy="85" rx="8" ry="14"/>
+            <ellipse cx="15" cy="50" rx="14" ry="8"/>
+            <ellipse cx="85" cy="50" rx="14" ry="8"/>
+            <ellipse cx="25" cy="25" rx="8" ry="14" transform="rotate(-45 25 25)"/>
+            <ellipse cx="75" cy="25" rx="8" ry="14" transform="rotate(45 75 25)"/>
+            <ellipse cx="25" cy="75" rx="8" ry="14" transform="rotate(45 25 75)"/>
+            <ellipse cx="75" cy="75" rx="8" ry="14" transform="rotate(-45 75 75)"/>
+          </g>
+          <circle cx="50" cy="50" r="20" fill="#3d2a22"/>
+        </svg>laris</a>
+      <span class="cabecalho-espaco"></span>
+    </div>
+    <nav id="menu-lateral" class="menu-lateral" aria-label="Navegação principal" hidden>
+      <a href="inicio.html">Início</a>
+      <a href="sobre.html">Sobre</a>
+      <a href="ia.html">IA Solaris</a>
+      <a href="loja.html" aria-current="page">Loja</a>
+    </nav>
+  </header>
+
+  <main class="loja">
+    <section class="loja-info" aria-labelledby="titulo-produto">
+      <div class="loja-topo">
+        <p class="legenda">Linha Premium</p>
+        <span class="loja-miniatura" role="img" aria-label="Painel solar"></span>
+        <h1 id="titulo-produto">Painel Essencial (450W - 500W)</h1>
+      </div>
+      <div class="loja-detalhes">
+        <p>Ideal para:</p>
+        <p>Casas pequenas, imóveis de aluguel e orçamentos enxutos.</p>
+        <p>Por que escolher: Preço acessível e tecnologia de silício monocristalino consagrada.</p>
+        <p>Economia: Suporta consumo básico (geladeira, TV, iluminação e ventiladores).</p>
+        <p>Garantia: 12 anos de produto | 25 anos de geração.</p>
+      </div>
+    </section>
+
+    <figure class="loja-imagem">
+      <!-- Coloque a foto em frontend/static/img/painel-essencial.jpg. -->
+      <img src="../static/img/painel-essencial.jpg" alt="Painel solar Essencial com estrutura para telhado" onerror="this.remove()">
+    </figure>
+  </main>
+</body>
+</html>

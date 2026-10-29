@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IA Solaris | Solaris</title>
+  <link rel="stylesheet" href="../static/style.css">
+  <script src="../js/menu.js" defer></script>
+  <script src="../js/ia.js" defer></script>
+</head>
+<body>
+  <header class="cabecalho">
+    <div class="container">
+      <button id="botao-menu" class="menu-btn" type="button" aria-label="Abrir menu"
+              aria-expanded="false" aria-controls="menu-lateral">
+        <span class="icone" aria-hidden="true">&#9776;</span> menu
+      </button>
+      <a class="marca logo" href="inicio.html" aria-label="Solaris">S<svg viewBox="0 0 100 100" aria-hidden="true">
+          <g fill="#ffa200">
+            <ellipse cx="50" cy="15" rx="8" ry="14"/>
+            <ellipse cx="50" cy="85" rx="8" ry="14"/>
+            <ellipse cx="15" cy="50" rx="14" ry="8"/>
+            <ellipse cx="85" cy="50" rx="14" ry="8"/>
+            <ellipse cx="25" cy="25" rx="8" ry="14" transform="rotate(-45 25 25)"/>
+            <ellipse cx="75" cy="25" rx="8" ry="14" transform="rotate(45 75 25)"/>
+            <ellipse cx="25" cy="75" rx="8" ry="14" transform="rotate(45 25 75)"/>
+            <ellipse cx="75" cy="75" rx="8" ry="14" transform="rotate(-45 75 75)"/>
+          </g>
+          <circle cx="50" cy="50" r="20" fill="#3d2a22"/>
+        </svg>laris</a>
+      <span class="cabecalho-espaco"></span>
+    </div>
+    <nav id="menu-lateral" class="menu-lateral" aria-label="Navegação principal" hidden>
+      <a href="inicio.html">Início</a>
+      <a href="sobre.html">Sobre</a>
+      <a href="ia.html" aria-current="page">IA Solaris</a>
+      <a href="loja.html">Loja</a>
+    </nav>
+  </header>
+
+  <main class="ia">
+    <aside class="ia-lateral" aria-label="Opções da Solaris IA">
+      <h2><span class="destaque">Solaris</span> IA</h2>
+      <button id="botao-novo-chat" class="ia-item" type="button"><span aria-hidden="true">&#9998;</span> Novo Chat</button>
+      <button class="ia-item" type="button" data-aviso="O histórico de conversas estará disponível em breve."><span aria-hidden="true">&#9745;</span> Histórico</button>
+      <button class="ia-item" type="button" data-aviso="A simulação de economia estará disponível em breve."><span aria-hidden="true">&#8599;</span> Simulação</button>
+      <button class="ia-item ia-config" type="button" data-aviso="As configurações estarão disponíveis em breve."><span aria-hidden="true">&#9881;</span> Configuração</button>
+    </aside>
+
+    <section class="ia-principal">
+      <p id="mensagem" class="mensagem" role="status" aria-live="polite" hidden></p>
+
+      <div id="conversa" class="ia-conversa" aria-live="polite">
+        <div id="boas-vindas" class="boas-vindas">
+          <svg viewBox="0 0 100 100" role="img" aria-label="Girassol Solaris">
+            <g fill="#ffa200">
+              <ellipse cx="50" cy="15" rx="9" ry="15"/>
+              <ellipse cx="50" cy="85" rx="9" ry="15"/>
+              <ellipse cx="15" cy="50" rx="15" ry="9"/>
+              <ellipse cx="85" cy="50" rx="15" ry="9"/>
+              <ellipse cx="25" cy="25" rx="9" ry="15" transform="rotate(-45 25 25)"/>
+              <ellipse cx="75" cy="25" rx="9" ry="15" transform="rotate(45 75 25)"/>
+              <ellipse cx="25" cy="75" rx="9" ry="15" transform="rotate(45 25 75)"/>
+              <ellipse cx="75" cy="75" rx="9" ry="15" transform="rotate(-45 75 75)"/>
+            </g>
+            <circle cx="50" cy="50" r="19" fill="#3d2a22"/>
+            <path d="M50 36 L54 46 L64 50 L54 54 L50 64 L46 54 L36 50 L46 46 Z" fill="#ffa200"/>
+          </svg>
+          <p>Olá, como posso <strong class="destaque">ajudar</strong> ?</p>
+        </div>
+      </div>
+
+      <form id="form-chat" class="barra-chat">
+        <button class="icone-botao" type="button" aria-label="Anexar arquivo" data-aviso="O envio de arquivos estará disponível em breve.">+</button>
+        <label for="texto-chat" hidden>Mensagem para a Solaris</label>
+        <input id="texto-chat" type="text" placeholder="Fale com solaris." autocomplete="off" required>
+        <button class="icone-botao" type="button" aria-label="Falar por voz" data-aviso="A entrada por voz estará disponível em breve.">&#127908;</button>
+        <button class="enviar" type="submit" aria-label="Enviar mensagem">&#8593;</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

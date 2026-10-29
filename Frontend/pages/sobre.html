@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sobre | Solaris</title>
+  <link rel="stylesheet" href="../static/style.css">
+  <script src="../js/menu.js" defer></script>
+</head>
+<body>
+  <header class="cabecalho">
+    <div class="container">
+      <button id="botao-menu" class="menu-btn" type="button" aria-label="Abrir menu"
+              aria-expanded="false" aria-controls="menu-lateral">
+        <span class="icone" aria-hidden="true">&#9776;</span> menu
+      </button>
+      <a class="marca logo" href="inicio.html" aria-label="Solaris">S<svg viewBox="0 0 100 100" aria-hidden="true">
+          <g fill="#ffa200">
+            <ellipse cx="50" cy="15" rx="8" ry="14"/>
+            <ellipse cx="50" cy="85" rx="8" ry="14"/>
+            <ellipse cx="15" cy="50" rx="14" ry="8"/>
+            <ellipse cx="85" cy="50" rx="14" ry="8"/>
+            <ellipse cx="25" cy="25" rx="8" ry="14" transform="rotate(-45 25 25)"/>
+            <ellipse cx="75" cy="25" rx="8" ry="14" transform="rotate(45 75 25)"/>
+            <ellipse cx="25" cy="75" rx="8" ry="14" transform="rotate(45 25 75)"/>
+            <ellipse cx="75" cy="75" rx="8" ry="14" transform="rotate(-45 75 75)"/>
+          </g>
+          <circle cx="50" cy="50" r="20" fill="#3d2a22"/>
+        </svg>laris</a>
+      <span class="cabecalho-espaco"></span>
+    </div>
+    <nav id="menu-lateral" class="menu-lateral" aria-label="Navegação principal" hidden>
+      <a href="inicio.html">Início</a>
+      <a href="sobre.html" aria-current="page">Sobre</a>
+      <a href="ia.html">IA Solaris</a>
+      <a href="loja.html">Loja</a>
+    </nav>
+  </header>
+
+  <main class="sobre">
+    <section class="sobre-texto">
+      <h1>Sobre nosso <span>projeto.</span></h1>
+      <p>Somos um projeto criado para fazer você <span class="destaque">economizar.</span>
+         Oferecemos um jeito mais <span class="destaque">barato de ter os seus próprios painéis solares</span>,
+         com um <span class="destaque">retorno</span> do investimento ainda
+         <span class="destaque">mais rápido</span> do que o dos nossos concorrentes.</p>
+      <p>E, sem mais delongas, que tal conhecer a nossa <span class="destaque">inovação?</span>
+         Criamos um suporte para placas solares inspirado nos <span class="destaque">girassóis</span>,
+         que maximiza a <span class="destaque">eficiência</span> do sistema.</p>
+      <p>Ele funciona com um mecanismo controlado por uma
+         <span class="destaque">inteligência artificial treinada</span> para saber
+         <span class="destaque">exatamente</span> onde o sol está em cada momento do dia,
+         e assim a placa está sempre na <span class="destaque">posição ideal.</span></p>
+    </section>
+
+    <figure class="figura">
+      <!-- Coloque a foto em frontend/static/img/rastreador-solar.jpg. Sem a foto, aparece o degradê. -->
+      <img src="../static/img/rastreador-solar.jpg" alt="Suporte para placa solar inspirado em girassol, ao pôr do sol" onerror="this.remove()">
+    </figure>
+  </main>
+</body>
+</html>
