@@ -954,3 +954,33 @@
       margin-top: 0;
     }
   }
+/* ---------- Gestão de clientes (CRUD do projeto integrador) ---------- */
+.aviso-dados {
+  padding: 13px 17px;
+  margin: 0 0 20px;
+  border: 1px solid var(--borda);
+  border-left: 4px solid var(--laranja);
+  border-radius: 8px;
+  background: #fffaf0;
+  color: var(--marinho);
+}
+.campo-id-cliente {
+  max-width: 240px;
+  margin-bottom: 22px;
+}
+.campos.campos-crud {
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  margin-bottom: 24px;
+}
+.acoes-crud, .barra-lista-clientes { flex-wrap: wrap; }
+.barra-lista-clientes .busca { flex-wrap: wrap; }
+.nota-lista {
+  padding: 0 24px 20px;
+  color: var(--texto-suave);
+  font-size: 13px;
+}
+@media (max-width: 650px) {
+  .campos.campos-crud { grid-template-columns: 1fr; }
+  .acoes-crud { flex-direction: column; }
+  .barra-lista-clientes .busca { align-items: stretch; }
+}

@@ -1,7 +1,12 @@
+"""Aplicação principal da API Solaris.
+
+O navegador acessa somente a FastAPI; a chave do Supabase fica no backend.
+"""
 
 import logging
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from httpx import RequestError
 from postgrest.exceptions import APIError
@@ -20,26 +25,16 @@ logger = logging.getLogger("uvicorn.error")
 
 app = FastAPI(
     title="Solaris - API",
-    description="Backend do Solaris com FastAPI e Supabase por HTTPS."
+    description="CRUD do projeto Solaris com FastAPI e Supabase por HTTPS.",
 )
 
-import logging
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from httpx import RequestError
-from postgrest.exceptions import APIError
-from controller.clientes import router
-
-logger = logging.getLogger("uvicorn.error")
-app = FastAPI(
-    title="Mercearia - API de Clientes",
-    description="CRUD de clientes com Supabase por HTTPS.",
-)
-
+# Portas locais usadas na aula (servidor Python e Live Server, se usado).
+# O CORS pertence ao backend; não colocar credenciais no JavaScript.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "http://127.0.0.1:5500",
+        "http://localhost:5500",
         "http://127.0.0.1:3000",
         "http://localhost:3000",
     ],
@@ -47,40 +42,19 @@ app.add_middleware(
     allow_headers=["Content-Type"],
 )
 
-app.include_router(router)
-
-@app.exception_handler(APIError)
-async def tratar_erro_supabase(request: Request, erro: APIError):
-    logger.error("Erro na operação do Supabase: %s", erro)
-    return JSONResponse(
-        status_code=502,
-        content={"detail": (
-            "O Supabase recusou a operação. "
-            "Confira a mensagem no terminal."
-        )},
-    )
-
-@app.exception_handler(RequestError)
-async def tratar_erro_rede(request: Request, erro: RequestError):
-    logger.error("Falha de comunicação: %s", type(erro).__name__)
-    return JSONResponse(
-        status_code=503,
-        content={"detail": (
-            "Não foi possível acessar o Supabase. "
-            "Verifique a conexão com a internet."
-        )},
-    )
-
-
-app.include_router(clientes_router)
-app.include_router(tecnico_router)
-app.include_router(simulacao_router)
-app.include_router(financiamento_router)
-app.include_router(pagamento_router)
-app.include_router(relatorio_router)
-app.include_router(paineis_router)
-app.include_router(instalacao_router)
-app.include_router(chatbot_router)
+# Cada conjunto de rotas é registrado UMA vez.
+for router in (
+    clientes_router,
+    tecnico_router,
+    simulacao_router,
+    financiamento_router,
+    pagamento_router,
+    relatorio_router,
+    paineis_router,
+    instalacao_router,
+    chatbot_router,
+):
+    app.include_router(router)
 
 
 @app.exception_handler(APIError)
@@ -88,12 +62,7 @@ async def tratar_erro_supabase(request: Request, erro: APIError):
     logger.error("Erro na operação do Supabase: %s", erro)
     return JSONResponse(
         status_code=502,
-        content={
-            "detail": (
-                "O Supabase recusou a operação. "
-                "Confira a mensagem no terminal."
-            )
-        },
+        content={"detail": "O Supabase recusou a operação. Confira o terminal."},
     )
 
 
@@ -102,10 +71,5 @@ async def tratar_erro_rede(request: Request, erro: RequestError):
     logger.error("Falha de comunicação: %s", type(erro).__name__)
     return JSONResponse(
         status_code=503,
-        content={
-            "detail": (
-                "Não foi possível acessar o Supabase. "
-                "Verifique a conexão com a internet."
-            )
-        },
+        content={"detail": "Não foi possível acessar o Supabase. Verifique a conexão."},
     )

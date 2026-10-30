@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clientes | Solaris</title>
+  <link rel="stylesheet" href="../static/style.css">
+  <script src="../js/menu.js" defer></script>
+  <script src="../js/clientes.js" defer></script>
+</head>
+<body>
+  <header class="cabecalho">
+    <div class="container">
+      <button id="botao-menu" class="menu-btn" type="button" aria-label="Abrir menu"
+              aria-expanded="false" aria-controls="menu-lateral">
+        <span class="icone" aria-hidden="true">&#9776;</span> menu
+      </button>
+      <a class="marca logo" href="inicio.html" aria-label="Solaris">S<svg viewBox="0 0 100 100" aria-hidden="true">
+          <g fill="#ffa200">
+            <ellipse cx="50" cy="15" rx="8" ry="14"/>
+            <ellipse cx="50" cy="85" rx="8" ry="14"/>
+            <ellipse cx="15" cy="50" rx="14" ry="8"/>
+            <ellipse cx="85" cy="50" rx="14" ry="8"/>
+            <ellipse cx="25" cy="25" rx="8" ry="14" transform="rotate(-45 25 25)"/>
+            <ellipse cx="75" cy="25" rx="8" ry="14" transform="rotate(45 75 25)"/>
+            <ellipse cx="25" cy="75" rx="8" ry="14" transform="rotate(45 25 75)"/>
+            <ellipse cx="75" cy="75" rx="8" ry="14" transform="rotate(-45 75 75)"/>
+          </g>
+          <circle cx="50" cy="50" r="20" fill="#3d2a22"/>
+        </svg>laris</a>
+      <span class="cabecalho-espaco"></span>
+    </div>
+    <nav id="menu-lateral" class="menu-lateral" aria-label="Navegação principal" hidden>
+      <a href="inicio.html" >Início</a>
+      <a href="sobre.html">Sobre</a>
+      <a href="ia.html">IA Solaris</a>
+      <a href="clientes.html" aria-current="page">Clientes (CRUD)</a>
+      <a href="loja.html">Loja</a>
+    </nav>
+  </header>
+  <main class="container">
+    <div class="titulo-pagina">
+      <p class="legenda">SOLARIS · INTEGRAÇÃO COM FASTAPI E SUPABASE</p>
+      <h1>Gestão de <span>clientes</span></h1>
+      <p>Cadastre, liste, consulte, edite e exclua clientes pela API.</p>
+    </div>
+    <p class="aviso-dados">Apresentação escolar: utilize apenas dados fictícios. Não insira CPF, RG ou dados pessoais verdadeiros.</p>
+    <p id="mensagem-clientes" class="mensagem" role="status" aria-live="polite" hidden></p>
+
+    <section class="painel" aria-labelledby="titulo-formulario">
+      <div class="painel-titulo">
+        <h2 id="titulo-formulario">Novo cliente</h2>
+        <span class="legenda">DADOS DO CLIENTE</span>
+      </div>
+      <form id="form-cliente" class="formulario">
+        <div class="campo campo-id-cliente">
+          <label for="id-cliente">ID do cliente (automático)</label>
+          <input id="id-cliente" type="text" placeholder="Gerado pelo banco" readonly>
+        </div>
+        <div class="campos campos-crud">
+          <div class="campo">
+            <label for="nome-cliente">Nome do cliente</label>
+            <input id="nome-cliente" name="nome-cliente" type="text" maxlength="50"
+                   placeholder="Digite o nome completo" required>
+          </div>
+          <div class="campo">
+            <label for="cpf-cliente">CPF (use dados fictícios)</label>
+            <input id="cpf-cliente" name="cpf-cliente" type="text" maxlength="14"
+                   placeholder="000.000.000-00" required>
+          </div>
+          <div class="campo">
+            <label for="rg-cliente">RG (use dados fictícios)</label>
+            <input id="rg-cliente" name="rg-cliente" type="text" maxlength="20"
+                   placeholder="RG fictício" required>
+          </div>
+          <div class="campo">
+            <label for="numero-cliente">Telefone</label>
+            <input id="numero-cliente" name="numero-cliente" type="tel" maxlength="15"
+                   placeholder="(44) 90000-0000" required>
+          </div>
+          <div class="campo">
+            <label for="email-cliente">E-mail</label>
+            <input id="email-cliente" name="email-cliente" type="email" maxlength="100"
+                   placeholder="exemplo@teste.com" required>
+          </div>
+          <div class="campo">
+            <label for="endereco-cliente">Endereço</label>
+            <input id="endereco-cliente" name="endereco-cliente" type="text" maxlength="150"
+                   placeholder="Rua, número, bairro, cidade" required>
+          </div>
+          <div class="campo">
+            <label for="tipo-imovel-cliente">Tipo de imóvel</label>
+            <input id="tipo-imovel-cliente" name="tipo-imovel-cliente" type="text" maxlength="30"
+                   placeholder="Casa, apartamento, comércio..." required>
+          </div>
+          <div class="campo">
+            <label for="renda-cliente">Renda mensal (R$)</label>
+            <input id="renda-cliente" name="renda-cliente" type="number" min="0" step="0.01" max="99999999.99"
+                   placeholder="Ex.: 3500.00" required>
+          </div>
+        </div>
+        <div class="acoes acoes-crud">
+          <button id="botao-salvar-cliente" class="botao botao-principal" type="submit">Cadastrar cliente</button>
+          <button id="botao-limpar-cliente" class="botao botao-secundario" type="button">Limpar formulário</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="painel" aria-labelledby="titulo-lista">
+      <div class="painel-titulo">
+        <h2 id="titulo-lista">Clientes cadastrados</h2>
+        <span id="total-clientes" class="legenda">Aguardando consulta...</span>
+      </div>
+      <div class="barra-lista barra-lista-clientes">
+        <form id="form-busca-cliente" class="busca">
+          <label for="busca-id-cliente">Consultar por ID</label>
+          <input id="busca-id-cliente" type="number" min="1" step="1" placeholder="Ex.: 1" required>
+          <button class="botao botao-secundario" type="submit">Consultar</button>
+        </form>
+        <button id="botao-listar-clientes" class="botao botao-secundario" type="button">↻ Listar todos</button>
+      </div>
+      <div class="tabela-container">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Nome</th>
+              <th scope="col">E-mail</th>
+              <th scope="col">Tipo de imóvel</th>
+              <th scope="col">Renda mensal</th>
+              <th scope="col">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="lista-clientes">
+            <tr><td colspan="6" class="vazio">Carregando clientes...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="nota-lista">Para ver ou alterar CPF, RG, telefone e endereço, clique em <strong>Editar</strong> e consulte o formulário acima.</p>
+    </section>
+    <footer class="rodape">Solaris · Projeto Integrador · Demonstração de CRUD</footer>
+  </main>
+</body>
+</html>

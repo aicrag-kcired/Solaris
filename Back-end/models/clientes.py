@@ -1,7 +1,6 @@
 
-from datetime import datetime
 from decimal import Decimal
-from pydantic import BaseModel, Field, EmailStr, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class ClienteEntrada(BaseModel):
