@@ -1,3 +1,4 @@
+
 """Aplicação principal da API Solaris.
 
 O navegador acessa somente a FastAPI; a chave do Supabase fica no backend.
@@ -12,6 +13,7 @@ from httpx import RequestError
 from postgrest.exceptions import APIError
 
 from controller.clientes import router as clientes_router
+from controller.ordem_servico import router as ordens_servico_router
 from controller.tecnico import router as tecnico_router
 from controller.simulacao import router as simulacao_router
 from controller.financiamento import router as financiamento_router
@@ -28,8 +30,7 @@ app = FastAPI(
     description="CRUD do projeto Solaris com FastAPI e Supabase por HTTPS.",
 )
 
-# Portas locais usadas na aula (servidor Python e Live Server, se usado).
-# O CORS pertence ao backend; não colocar credenciais no JavaScript.
+# Configuração de acesso do frontend à API.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -42,9 +43,10 @@ app.add_middleware(
     allow_headers=["Content-Type"],
 )
 
-# Cada conjunto de rotas é registrado UMA vez.
+# Registro das rotas do Solaris.
 for router in (
     clientes_router,
+    ordens_servico_router,
     tecnico_router,
     simulacao_router,
     financiamento_router,
@@ -60,16 +62,30 @@ for router in (
 @app.exception_handler(APIError)
 async def tratar_erro_supabase(request: Request, erro: APIError):
     logger.error("Erro na operação do Supabase: %s", erro)
+
+    if str(getattr(erro, "code", "")) == "23503":
+        return JSONResponse(
+            status_code=409,
+            content={
+                "detail": "Operação bloqueada por vínculo entre tabelas."
+            },
+        )
+
     return JSONResponse(
         status_code=502,
-        content={"detail": "O Supabase recusou a operação. Confira o terminal."},
+        content={
+            "detail": "O Supabase recusou a operação. Confira o terminal."
+        },
     )
 
 
 @app.exception_handler(RequestError)
 async def tratar_erro_rede(request: Request, erro: RequestError):
     logger.error("Falha de comunicação: %s", type(erro).__name__)
+
     return JSONResponse(
         status_code=503,
-        content={"detail": "Não foi possível acessar o Supabase. Verifique a conexão."},
+        content={
+            "detail": "Não foi possível acessar o Supabase. Verifique a conexão."
+        },
     )
