@@ -15,7 +15,7 @@
               aria-expanded="false" aria-controls="menu-lateral">
         <span class="icone" aria-hidden="true">&#9776;</span> menu
       </button>
-      <a class="marca logo" href="inicio.html" aria-label="Solaris">S<svg viewBox="0 0 100 100" aria-hidden="true">
+      <a class="marca logo" href="inicio.html" aria-label="Solaris">S<svg id="solaris-secret-sun" viewBox="0 0 100 100" aria-hidden="true" style="cursor: pointer;">
           <g fill="#ffa200">
             <ellipse cx="50" cy="15" rx="8" ry="14"/>
             <ellipse cx="50" cy="85" rx="8" ry="14"/>
@@ -80,9 +80,9 @@
             <button id="botao-entrar" class="botao botao-principal" type="submit">Entrar</button>
           </div>
         </form>
-          <div class="acesso-troca">
-            <button id="botao-ir-cadastro" class="link-botao" type="button">Sem conta? Cadastre-se</button>
-          </div>
+        <div class="acesso-troca">
+          <button id="botao-ir-cadastro" class="link-botao" type="button">Sem conta? Cadastre-se</button>
+        </div>
       </section>
 
       <section id="painel-cadastro" class="painel" aria-labelledby="titulo-cadastro" hidden>
@@ -143,9 +143,9 @@
             <button id="botao-limpar" class="botao botao-secundario" type="button">Limpar</button>
           </div>
         </form>
-          <div class="acesso-troca">
-            <button id="botao-ir-login" class="link-botao" type="button">Já tem conta? Entrar</button>
-          </div>
+        <div class="acesso-troca">
+          <button id="botao-ir-login" class="link-botao" type="button">Já tem conta? Entrar</button>
+        </div>
       </section>
     </div>
 
@@ -167,7 +167,39 @@
       </article>
     </section>
 
-    <footer class="rodape">Solaris · Iluminando seu futuro</footer>
+    <footer class="rodape" style="position: relative;">
+      Solaris · Iluminando seu futuro
+      <button type="button"
+              onclick="abrirSegredoSolaris()"
+              aria-label="Acesso secreto"
+              style="background: transparent; border: none; color: inherit; opacity: 0.45; font-size: 13px; cursor: pointer; margin-left: 8px; padding: 2px 4px; transition: opacity 0.25s;"
+              onmouseover="this.style.opacity='1'"
+              onmouseout="this.style.opacity='0.45'">🌻</button>
+    </footer>
   </main>
+
+  <script>
+    function abrirSegredoSolaris() {
+      const senha = prompt("Acesso restrito Solaris. Digite a senha:");
+      if (senha === "67") {
+        window.location.href = "easteregg.html";
+      } else if (senha !== null) {
+        alert("Senha incorreta!");
+      }
+    }
+
+    let sunClicks = 0;
+    const logoSun = document.getElementById('solaris-secret-sun');
+    if (logoSun) {
+      logoSun.addEventListener('click', (e) => {
+        e.preventDefault();
+        sunClicks++;
+        if (sunClicks >= 3) {
+          sunClicks = 0;
+          abrirSegredoSolaris();
+        }
+      });
+    }
+  </script>
 </body>
 </html>
