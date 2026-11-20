@@ -15,7 +15,7 @@
               aria-expanded="false" aria-controls="menu-lateral">
         <span class="icone" aria-hidden="true">&#9776;</span> menu
       </button>
-      <a class="marca logo" href="../pages/inicio.html" aria-label="Solaris">S<svg viewBox="0 0 100 100" aria-hidden="true">
+      <a class="marca logo" href="../pages/index.html" aria-label="Solaris">S<svg viewBox="0 0 100 100" aria-hidden="true">
           <g fill="#ffa200">
             <ellipse cx="50" cy="15" rx="8" ry="14"/>
             <ellipse cx="50" cy="85" rx="8" ry="14"/>
@@ -32,8 +32,9 @@
     </div>
     <nav id="menu-lateral" class="menu-lateral" aria-label="Navegação principal" hidden>
       <a href="../pages/index.html">Início</a>
+      <a href="../pages/inicio.html" aria-current="page">Login / Cadastro</a>
       <a href="../pages/sobre.html">Sobre</a>
-      <a href="../pages/ia.html" aria-current="page">IA Solaris</a>
+      <a href="../pages/ia.html">IA Solaris</a>
       <a href="../pages/clientes.html">Clientes (CRUD)</a>
       <a href="../pages/loja.html">Loja</a>
     </nav>
@@ -80,9 +81,9 @@
             <button id="botao-entrar" class="botao botao-principal" type="submit">Entrar</button>
           </div>
         </form>
-          <div class="acesso-troca">
-            <button id="botao-ir-cadastro" class="link-botao" type="button">Sem conta? Cadastre-se</button>
-          </div>
+        <div class="acesso-troca">
+          <button id="botao-ir-cadastro" class="link-botao" type="button">Sem conta? Cadastre-se</button>
+        </div>
       </section>
 
       <section id="painel-cadastro" class="painel" aria-labelledby="titulo-cadastro" hidden>
@@ -99,16 +100,16 @@
             </div>
             <div class="campo">
               <label for="cpf-cliente">CPF</label>
-              <input id="cpf-cliente" type="text" maxlength="14"
+              <input id="cpf-cliente" type="text" inputmode="numeric" maxlength="14"
                      placeholder="000.000.000-00" required>
             </div>
             <div class="campo">
               <label for="rg-cliente">RG</label>
-              <input id="rg-cliente" type="text" maxlength="20" required>
+              <input id="rg-cliente" type="text" inputmode="numeric" maxlength="20" required>
             </div>
             <div class="campo">
               <label for="numero-cliente">Telefone</label>
-              <input id="numero-cliente" type="tel" maxlength="15"
+              <input id="numero-cliente" type="tel" inputmode="numeric" maxlength="15"
                      placeholder="(41) 90000-0000" required>
             </div>
             <div class="campo">
@@ -143,9 +144,9 @@
             <button id="botao-limpar" class="botao botao-secundario" type="button">Limpar</button>
           </div>
         </form>
-          <div class="acesso-troca">
-            <button id="botao-ir-login" class="link-botao" type="button">Já tem conta? Entrar</button>
-          </div>
+        <div class="acesso-troca">
+          <button id="botao-ir-login" class="link-botao" type="button">Já tem conta? Entrar</button>
+        </div>
       </section>
     </div>
 
@@ -167,7 +168,10 @@
       </article>
     </section>
 
-    <footer class="rodape">Solaris · Iluminando seu futuro</footer>
+    <footer class="rodape">
+      Solaris · Iluminando seu futuro
+      <a href="easteregg.html" title="Segredo Solaris" style="text-decoration: none; margin-left: 6px;">🌻</a>
+    </footer>
   </main>
 </body>
 </html>
