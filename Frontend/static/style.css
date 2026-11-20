@@ -1,5 +1,5 @@
 /* =====================================================
-   SOLARIS - style.css (versão 2)
+   SOLARIS - style.css (completo)
    Paleta: laranja #ffa200 · marrom #3d2a22 · creme #fff1d6
    ===================================================== */
 
@@ -313,6 +313,11 @@ input[readonly] {
 }
 .link-botao:hover { color: var(--laranja-escuro); }
 
+/* Indica o botão escolhido nos controles de acessibilidade e tema */
+.botao[aria-pressed="true"] {
+  box-shadow: inset 0 0 0 3px var(--marrom);
+}
+
 /* ---------- Busca e tabela ---------- */
 .barra-lista {
   padding: 22px 24px;
@@ -484,26 +489,52 @@ td .botao {
 /* ---------- Tela Sobre ---------- */
 .sobre {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: 560px;
+  grid-template-columns: 1.05fr 1fr;
+  align-items: stretch;
+  background: linear-gradient(180deg, #fffdf9 0%, #ffffff 60%);
 }
 .sobre-texto {
-  padding: 48px 7%;
-  font-size: 18px;
-  line-height: 1.75;
+  padding: 64px 7% 56px 8%;
+  font-size: 17px;
+  line-height: 1.8;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 .sobre-texto h1 {
-  font-size: clamp(32px, 4.5vw, 52px);
-  margin-bottom: 22px;
+  font-size: clamp(34px, 4.2vw, 50px);
+  line-height: 1.12;
+  margin-bottom: 26px;
 }
-.sobre-texto p { margin-bottom: 18px; }
+.sobre-texto h1::after {
+  content: "";
+  display: block;
+  width: 72px;
+  height: 6px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--laranja), #ffd36b);
+  margin-top: 14px;
+}
+.sobre-texto p {
+  margin-bottom: 20px;
+  max-width: 560px;
+  color: var(--marrom);
+}
+/* Destaques com marcação laranja por baixo, em vez de só texto laranja */
+.sobre-texto .destaque {
+  color: var(--marrom);
+  font-weight: 700;
+  background: linear-gradient(transparent 60%, rgba(255, 162, 0, .35) 60%);
+  padding: 0 2px;
+}
 
 .figura {
-  margin: 0;
-  min-height: 320px;
+  position: relative;
+  min-height: 420px;
+  margin: 40px 40px 40px 0;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--sombra-forte);
   background: linear-gradient(180deg, #e8742a, #f6a23a 60%, #7a3f1d);
 }
 .figura img {
@@ -511,7 +542,9 @@ td .botao {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform .6s ease;
 }
+.figura:hover img { transform: scale(1.04); }
 
 /* ---------- Solaris IA ---------- */
 .ia {
@@ -659,7 +692,7 @@ td .botao {
   transform: scale(1.08);
 }
 
-/* ---------- Loja ---------- */
+/* ---------- Loja (base) ---------- */
 .loja {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -699,6 +732,12 @@ td .botao {
     repeating-linear-gradient(0deg, transparent 0 17px, rgba(255, 255, 255, .15) 17px 18px),
     linear-gradient(135deg, #3d2a22, #7a5c4a);
 }
+.loja-miniatura-premium {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 17px, rgba(255, 255, 255, .2) 17px 18px),
+    repeating-linear-gradient(0deg, transparent 0 17px, rgba(255, 255, 255, .2) 17px 18px),
+    linear-gradient(135deg, #ffa200, #8a5a2b);
+}
 .loja-detalhes {
   max-width: 560px;
   margin: 22px auto;
@@ -714,7 +753,6 @@ td .botao {
   color: var(--laranja-escuro);
   font-weight: bold;
 }
-
 .loja-imagem {
   margin: 0;
   display: flex;
@@ -728,15 +766,176 @@ td .botao {
   max-height: 560px;
 }
 
-/* ---------- Animações ---------- */
-@keyframes aparecer-baixo {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* ---------- Loja: vitrine com dois painéis lado a lado ---------- */
+.loja-vitrine {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+  width: min(1120px, 92%);
+  margin: 0 auto;
+  padding: 28px 0 40px;
 }
+.loja-vitrine .loja {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  overflow: hidden;
+  background: var(--branco);
+  box-shadow: var(--sombra);
+}
+.loja-vitrine .loja-info { border-right: 0; }
+.loja-vitrine .loja-detalhes {
+  max-width: none;
+  margin: 16px;
+}
+.loja-vitrine .loja-topo h1 { font-size: 22px; }
+.loja-vitrine .loja-topo .legenda {
+  background: var(--marrom);
+  color: var(--branco);
+}
+/* A área da imagem fica oculta até as fotos estarem em static/img/ */
+.loja-vitrine .loja-imagem { display: none; }
+
+/* ---------- Rodapé da tela de Sobre e Loja (sem alteração no HTML) ---------- */
+
+/* ---------- Animações ---------- */
 @keyframes flutuar {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-10px); }
 }
+
+/* ---------- Modo escuro ---------- */
+:root[data-theme="dark"] {
+  --marrom: #f6e7d2;
+  --marrom-claro: #cdb8a6;
+  --creme: #3a2a22;
+  --creme-claro: #2a1f19;
+  --borda: #4a3a31;
+  --branco: #1f1612;
+  --sombra: 0 8px 24px rgba(0, 0, 0, .35);
+  --sombra-forte: 0 16px 40px rgba(0, 0, 0, .5);
+  color-scheme: dark;
+}
+:root[data-theme="dark"] body {
+  background: #140e0b;
+  color: var(--marrom);
+}
+:root[data-theme="dark"] .cabecalho {
+  background: rgba(31, 22, 18, .94);
+  border-bottom-color: var(--borda);
+}
+:root[data-theme="dark"] .menu-btn {
+  background: var(--creme-claro);
+  color: var(--marrom);
+}
+:root[data-theme="dark"] .menu-lateral a {
+  color: var(--marrom);
+}
+:root[data-theme="dark"] .menu-lateral a:hover,
+:root[data-theme="dark"] .menu-lateral a[aria-current="page"] {
+  background: var(--creme);
+  color: var(--laranja);
+}
+/* Textos sobre fundo laranja precisam continuar escuros */
+:root[data-theme="dark"] .botao-principal,
+:root[data-theme="dark"] .enviar,
+:root[data-theme="dark"] .msg.usuario,
+:root[data-theme="dark"] .loja-topo .legenda {
+  color: #2a1f19;
+}
+:root[data-theme="dark"] th {
+  background: #2a1f19;
+  color: var(--marrom);
+}
+:root[data-theme="dark"] .sobre {
+  background: #140e0b;
+}
+:root[data-theme="dark"] .sobre-texto p,
+:root[data-theme="dark"] .sobre-texto .destaque {
+  color: var(--marrom);
+}
+:root[data-theme="dark"] .mensagem {
+  background: #1e2d25;
+  border-color: #3f6f55;
+  color: #cfe9d9;
+}
+:root[data-theme="dark"] .mensagem.erro {
+  background: #3a1f17;
+  border-color: #7a3a26;
+  color: #f2c4b2;
+}
+:root[data-theme="dark"] .aviso-dados {
+  background: var(--creme-claro);
+  color: var(--marrom);
+}
+
+/* ---------- Acessibilidade ---------- */
+
+/* Tamanho do texto */
+html[data-texto="grande"] body { zoom: 1.15; }
+html[data-texto="maior"] body { zoom: 1.3; }
+
+/* Espaçamento entre linhas */
+html[data-espacamento="amplo"] body { line-height: 2; }
+
+/* Links sublinhados */
+html[data-links="sublinhados"] a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Reduzir animações e transições */
+html[data-movimento="reduzido"] *,
+html[data-movimento="reduzido"] *::before,
+html[data-movimento="reduzido"] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
+/* Alto contraste: fundo branco, texto preto e destaques mais fortes */
+html[data-contraste="alto"] body {
+  background: #ffffff;
+  color: #000000;
+}
+html[data-contraste="alto"] {
+  --marrom: #000000;
+  --marrom-claro: #000000;
+  --laranja: #ffd000;
+  --laranja-escuro: #000000;
+  --borda: #000000;
+  --creme: #ffffff;
+  --creme-claro: #ffffff;
+  --branco: #ffffff;
+}
+html[data-contraste="alto"] .botao,
+html[data-contraste="alto"] input:not([type="range"]),
+html[data-contraste="alto"] .painel,
+html[data-contraste="alto"] .cartao {
+  border: 2px solid #000000;
+}
+html[data-contraste="alto"] .botao-principal,
+html[data-contraste="alto"] .enviar,
+html[data-contraste="alto"] .msg.usuario,
+html[data-contraste="alto"] .loja-topo .legenda {
+  background: #ffd000;
+  color: #000000;
+}
+html[data-contraste="alto"] th {
+  background: #000000;
+  color: #ffffff;
+}
+html[data-contraste="alto"] .hero {
+  background: #000000;
+}
+html[data-contraste="alto"] .hero h2 {
+  text-shadow: none;
+}
+
+/* ---------- Celulares e tablets ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation: none !important;
@@ -745,7 +944,6 @@ td .botao {
   }
 }
 
-/* ---------- Celulares e tablets ---------- */
 @media (max-width: 760px) {
   h1 { font-size: 28px; }
   .logo { font-size: 36px; }
@@ -755,9 +953,12 @@ td .botao {
   .hero h2 { letter-spacing: .2em; }
   .acesso { padding: 36px 0 32px; }
   .beneficios { grid-template-columns: 1fr; }
-  .sobre, .loja { grid-template-columns: 1fr; }
+  .sobre { grid-template-columns: 1fr; }
+  .sobre-texto { padding: 40px 20px 24px; }
+  .figura { min-height: 260px; margin: 0 20px 36px; }
+  .loja { grid-template-columns: 1fr; }
   .loja-info { border-right: 0; }
-  .sobre-texto { padding: 32px 20px; }
+  .loja-vitrine { grid-template-columns: 1fr; }
   .ia { grid-template-columns: 1fr; }
   .ia-lateral {
     flex-direction: row;
@@ -773,158 +974,4 @@ td .botao {
   .campos.campos-crud { grid-template-columns: 1fr; }
   .acoes { flex-direction: column; }
   .busca input { max-width: 100%; }
-}/* ---------- Vitrine com vários produtos ---------- */
-.loja-vitrine {
-  display: flex;
-  flex-direction: column;
-}
-.loja-vitrine .loja {
-  border-bottom: 1px solid var(--borda);
-}
-.loja-miniatura-premium {
-  background:
-    repeating-linear-gradient(90deg, transparent 0 17px, rgba(255, 255, 255, .2) 17px 18px),
-    repeating-linear-gradient(0deg, transparent 0 17px, rgba(255, 255, 255, .2) 17px 18px),
-    linear-gradient(135deg, #ffa200, #8a5a2b);
-}
-.loja-vitrine .legenda {
-  background: var(--marrom) !important;
-  color: var(--creme) !important;
-}/* ---------- Vitrine lado a lado ---------- */
-.loja-vitrine {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  align-items: start;
-  padding: 28px 0 40px;
-  max-width: 1120px;
-  margin: 0 auto;
-  width: min(1120px, 92%);
-}
-.loja-vitrine .loja {
-  display: flex;
-  flex-direction: column;
-  min-height: auto;
-  border: 1px solid var(--borda);
-  border-radius: var(--raio);
-  overflow: hidden;
-  background: var(--branco);
-  box-shadow: var(--sombra);
-}
-.loja-vitrine .loja-info {
-  border-right: 0;
-}
-.loja-vitrine .loja-detalhes {
-  max-width: none;
-  margin: 16px;
-}
-.loja-vitrine .loja-topo h1 {
-  font-size: 22px;
-}
-.loja-vitrine .loja-imagem {
-  min-height: 280px;
-  border-top: 1px solid var(--borda);
-}
-.loja-vitrine .loja-imagem img {
-  max-height: 320px;
-}
-.loja-vitrine .legenda {
-  background: var(--marrom) !important;
-  color: var(--creme) !important;
-}
-.loja-miniatura-premium {
-  background:
-    repeating-linear-gradient(90deg, transparent 0 17px, rgba(255, 255, 255, .2) 17px 18px),
-    repeating-linear-gradient(0deg, transparent 0 17px, rgba(255, 255, 255, .2) 17px 18px),
-    linear-gradient(135deg, #ffa200, #8a5a2b);
-}
-
-/* Em celulares, os painéis voltam a ficar um embaixo do outro */
-@media (max-width: 760px) {
-  .loja-vitrine {
-    grid-template-columns: 1fr;
-  }
-}/* Esconde a área da imagem enquanto as fotos não estiverem disponíveis */
-.loja-vitrine .loja-imagem {
-  display: none;
-}/* ---------- Sobre (versão melhorada) ---------- */
-.sobre {
-  grid-template-columns: 1.05fr 1fr;
-  min-height: 0;
-  align-items: stretch;
-  background: linear-gradient(180deg, #fffdf9 0%, #ffffff 60%);
-}
-
-.sobre-texto {
-  padding: 64px 7% 56px 8%;
-  font-size: 17px;
-  line-height: 1.8;
-  text-align: left;
-  font-style: normal;
-  justify-content: center;
-}
-
-.sobre-texto h1 {
-  font-size: clamp(34px, 4.2vw, 50px);
-  line-height: 1.12;
-  margin-bottom: 26px;
-}
-.sobre-texto h1::after {
-  content: "";
-  display: block;
-  width: 72px;
-  height: 6px;
-  border-radius: 6px;
-  background: linear-gradient(90deg, var(--laranja), #ffd36b);
-  margin-top: 14px;
-}
-
-.sobre-texto p {
-  margin-bottom: 20px;
-  color: var(--marrom);
-  max-width: 560px;
-}
-
-/* Os destaques viram marcações com fundo suave, em vez de só texto laranja */
-.sobre-texto .destaque {
-  color: var(--marrom);
-  font-weight: 700;
-  background: linear-gradient(transparent 60%, rgba(255, 162, 0, .35) 60%);
-  padding: 0 2px;
-}
-
-/* Imagem com cantos arredondados e sombra */
-.figura {
-  position: relative;
-  min-height: 420px;
-  margin: 40px 40px 40px 0;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: var(--sombra-forte);
-  background: linear-gradient(180deg, #e8742a, #f6a23a 60%, #7a3f1d);
-}
-.figura img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform .6s ease;
-}
-.figura:hover img {
-  transform: scale(1.04);
-}
-
-/* Celulares: texto em cima, imagem embaixo */
-@media (max-width: 760px) {
-  .sobre {
-    grid-template-columns: 1fr;
-  }
-  .sobre-texto {
-    padding: 40px 20px 24px;
-    text-align: left;
-  }
-  .figura {
-    min-height: 260px;
-    margin: 0 20px 36px;
-  }
 }
