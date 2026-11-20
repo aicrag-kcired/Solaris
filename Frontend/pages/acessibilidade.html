@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acessibilidade | Solaris</title>
+  <link rel="stylesheet" href="../static/style.css">
+  <script src="../js/menu.js" defer></script>
+  <script src="../js/acessibilidade.js" defer></script>
+</head>
+<body>
+  <header class="cabecalho">
+    <div class="container">
+      <button id="botao-menu" class="menu-btn" type="button" aria-label="Abrir menu"
+              aria-expanded="false" aria-controls="menu-lateral">
+        <span class="icone" aria-hidden="true">&#9776;</span> menu
+      </button>
+      <a class="marca logo" href="../pages/index.html" aria-label="Solaris">S<svg viewBox="0 0 100 100" aria-hidden="true">
+          <g fill="#ffa200">
+            <ellipse cx="50" cy="15" rx="8" ry="14"/>
+            <ellipse cx="50" cy="85" rx="8" ry="14"/>
+            <ellipse cx="15" cy="50" rx="14" ry="8"/>
+            <ellipse cx="85" cy="50" rx="14" ry="8"/>
+            <ellipse cx="25" cy="25" rx="8" ry="14" transform="rotate(-45 25 25)"/>
+            <ellipse cx="75" cy="25" rx="8" ry="14" transform="rotate(45 75 25)"/>
+            <ellipse cx="25" cy="75" rx="8" ry="14" transform="rotate(45 25 75)"/>
+            <ellipse cx="75" cy="75" rx="8" ry="14" transform="rotate(-45 75 75)"/>
+          </g>
+          <circle cx="50" cy="50" r="20" fill="#3d2a22"/>
+        </svg>laris</a>
+      <span class="cabecalho-espaco"></span>
+    </div>
+    <nav id="menu-lateral" class="menu-lateral" aria-label="Navegação principal" hidden>
+      <a href="../pages/index.html">Início</a>
+      <a href="../pages/sobre.html">Sobre</a>
+      <a href="../pages/ia.html">IA Solaris</a>
+      <a href="../pages/clientes.html">Clientes (CRUD)</a>
+      <a href="../pages/loja.html">Loja</a>
+      <a href="../pages/acessibilidade.html" aria-current="page">Acessibilidade</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="titulo-pagina">
+      <p class="legenda">SOLARIS · ACESSIBILIDADE</p>
+      <h1>Ajustes de <span>acessibilidade</span></h1>
+      <p>Escolha como o site deve aparecer para você. As configurações valem em todas as telas.</p>
+    </div>
+
+    <section class="painel" aria-labelledby="titulo-tema">
+      <div class="painel-titulo">
+        <h2 id="titulo-tema">Tema</h2>
+        <span class="legenda">CORES</span>
+      </div>
+      <div class="formulario acoes">
+        <button class="botao botao-secundario" type="button" data-tema="light" aria-pressed="false">Claro</button>
+        <button class="botao botao-secundario" type="button" data-tema="dark" aria-pressed="false">Escuro</button>
+      </div>
+    </section>
+
+    <section class="painel" aria-labelledby="titulo-texto">
+      <div class="painel-titulo">
+        <h2 id="titulo-texto">Tamanho do texto</h2>
+        <span class="legenda">LEITURA</span>
+      </div>
+      <div class="formulario acoes">
+        <button class="botao botao-secundario" type="button" data-chave="texto" data-valor="normal" aria-pressed="false">Normal</button>
+        <button class="botao botao-secundario" type="button" data-chave="texto" data-valor="grande" aria-pressed="false">Grande</button>
+        <button class="botao botao-secundario" type="button" data-chave="texto" data-valor="maior" aria-pressed="false">Muito grande</button>
+      </div>
+    </section>
+
+    <section class="painel" aria-labelledby="titulo-contraste">
+      <div class="painel-titulo">
+        <h2 id="titulo-contraste">Contraste</h2>
+        <span class="legenda">VISUAL</span>
+      </div>
+      <div class="formulario acoes">
+        <button class="botao botao-secundario" type="button" data-chave="contraste" data-valor="normal" aria-pressed="false">Padrão</button>
+        <button class="botao botao-secundario" type="button" data-chave="contraste" data-valor="alto" aria-pressed="false">Alto contraste</button>
+      </div>
+    </section>
+
+    <section class="painel" aria-labelledby="titulo-movimento">
+      <div class="painel-titulo">
+        <h2 id="titulo-movimento">Movimento</h2>
+        <span class="legenda">ANIMAÇÕES</span>
+      </div>
+      <div class="formulario acoes">
+        <button class="botao botao-secundario" type="button" data-chave="movimento" data-valor="normal" aria-pressed="false">Com animações</button>
+        <button class="botao botao-secundario" type="button" data-chave="movimento" data-valor="reduzido" aria-pressed="false">Reduzir animações</button>
+      </div>
+    </section>
+
+    <section class="painel" aria-labelledby="titulo-links">
+      <div class="painel-titulo">
+        <h2 id="titulo-links">Links e espaçamento</h2>
+        <span class="legenda">NAVEGAÇÃO</span>
+      </div>
+      <div class="formulario acoes">
+        <button class="botao botao-secundario" type="button" data-chave="links" data-valor="normal" aria-pressed="false">Links normais</button>
+        <button class="botao botao-secundario" type="button" data-chave="links" data-valor="sublinhados" aria-pressed="false">Links sublinhados</button>
+        <button class="botao botao-secundario" type="button" data-chave="espacamento" data-valor="normal" aria-pressed="false">Espaçamento normal</button>
+        <button class="botao botao-secundario" type="button" data-chave="espacamento" data-valor="amplo" aria-pressed="false">Espaçamento amplo</button>
+      </div>
+    </section>
+
+    <div class="acoes" style="margin-bottom: 30px;">
+      <button id="botao-restaurar" class="botao botao-principal" type="button">Restaurar padrão</button>
+    </div>
+
+    <footer class="rodape">Solaris · Iluminando seu futuro</footer>
+  </main>
+</body>
+</html>
