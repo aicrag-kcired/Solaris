@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="../static/style.css">
   <script src="../js/menu.js" defer></script>
   <script src="../js/inicio.js" defer></script>
+  <script src="../js/acessibilidade.js" defer></script>
 </head>
 <body>
   <header class="cabecalho">
@@ -28,14 +29,32 @@
           </g>
           <circle cx="50" cy="50" r="20" fill="#3d2a22"/>
         </svg>laris</a>
-      <span class="cabecalho-espaco"></span>
+
+      <div class="acessibilidade-wrapper">
+        <button id="btn-engrenagem" class="btn-engrenagem" type="button"
+                aria-label="Opções de acessibilidade" aria-expanded="false"
+                aria-controls="menu-acessibilidade" title="Acessibilidade">⚙️</button>
+
+        <div id="menu-acessibilidade" class="menu-acessibilidade" hidden>
+          <h4>Acessibilidade</h4>
+          <button id="btn-tema" class="opcao-acess" type="button">🌓 Modo Escuro</button>
+          <div class="controle-fonte">
+            <span>Tamanho da letra:</span>
+            <div class="botoes-fonte">
+              <button type="button" data-set-texto="normal" aria-pressed="true">Normal</button>
+              <button type="button" data-set-texto="grande" aria-pressed="false">A+</button>
+              <button type="button" data-set-texto="maior" aria-pressed="false">A++</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <nav id="menu-lateral" class="menu-lateral" aria-label="Navegação principal" hidden>
       <a href="../pages/index.html">Início</a>
       <a href="../pages/inicio.html" aria-current="page">Login / Cadastro</a>
       <a href="../pages/sobre.html">Sobre</a>
       <a href="../pages/ia.html">IA Solaris</a>
-      <a href="../pages/clientes.html">Clientes (CRUD)</a>
+      <a href="../pages/clientes.html">Administrador</a>
       <a href="../pages/loja.html">Loja</a>
     </nav>
   </header>
@@ -53,7 +72,7 @@
     <p id="mensagem" class="mensagem" role="status" aria-live="polite" hidden></p>
 
     <div class="acesso">
-      <a class="botao botao-principal botao-link" href="clientes.html">Abrir gestão de clientes (CRUD)</a>
+      <a class="botao botao-principal botao-link" href="clientes.html">Área do Administrador</a>
       <button id="botao-login" class="botao botao-principal botao-login" type="button"
               aria-expanded="false" aria-controls="area-acesso">Login</button>
     </div>
