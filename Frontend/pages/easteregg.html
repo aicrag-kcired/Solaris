@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solaris Overdrive 3D - Arena Tática</title>
+    <title>Solaris Overdrive 3D - Arena Vertical</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; font-family: 'Segoe UI', Roboto, Arial, sans-serif; }
         body { overflow: hidden; background-color: #070b14; color: #f8fafc; }
@@ -133,9 +133,9 @@
         </div>
 
         <div id="panel-missoes" class="cs-panel">
-            <h2>COMPLEXO SOLARIS SECTOR-07</h2>
+            <h2>ARENA VERTICAL SOLARIS</h2>
             <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 12px;">
-                Arena completa com Torre Heliotérmica, Subestação de Alta Tensão, Rastreadores Solares e Bunkers de Energia.
+                Suba pelas rampas das 4 Torres de Vigia, entre nos Galpões Táticos com janelas e domine o topo da Torre Central!
             </p>
             <div style="font-size: 13px; color: #22c55e;">✔ Recorde: <span id="best-score">0</span> Abates</div>
         </div>
@@ -165,7 +165,7 @@
                 <div class="rank-icon">☀</div>
                 <div>
                     <div style="font-weight: bold; font-size: 14px;">GUARDIÃO SOLARIS</div>
-                    <div style="font-size: 11px; color: #f59e0b;">Especialista em Rede Fotovoltaica</div>
+                    <div style="font-size: 11px; color: #f59e0b;">Especialista em Combate Vertical</div>
                 </div>
             </div>
             <button class="play-btn-cs" id="start-match-btn">JOGAR</button>
@@ -180,7 +180,7 @@
         <div id="kill-feed"></div>
         <div id="crosshair"></div>
         <div style="color: #cbd5e1; font-size: 13px; text-align: center;">
-            WASD: Mover | ESPAÇO: Pular | CLIQUE: Atirar | ESC: Voltar ao Lobby
+            WASD: Mover | ESPAÇO: Pular | SUBA NAS RAMPAS DAS TORRES E ENTRE NOS GALPÕES | CLIQUE: Atirar
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -191,9 +191,11 @@
         let gameState = 'LOBBY';
         let prevTime = performance.now();
 
-        const player = { height: 2.3, speed: 15, jumpForce: 11.5, velocityY: 0, isGrounded: true, hp: 100, score: 0, bestScore: 0, credits: 1250 };
+        const player = { height: 2.3, speed: 16, jumpForce: 12.5, velocityY: 0, isGrounded: true, hp: 100, score: 0, bestScore: 0, credits: 1250 };
         let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
-        const obstacles = [], bullets = [], enemies = [], animatedProps = [];
+        
+        // obstacles = paredes sólidas | walkableSurfaces = pisos elevados e rampas onde o jogador pisa
+        const obstacles = [], walkableSurfaces = [], bullets = [], enemies = [], animatedProps = [];
 
         let lobbyAgent, fpsGunMesh, fpsGunCore, fpsGunBarrel;
         let gunRecoil = 0, isDraggingLobby = false, prevMouseX = 0;
@@ -211,7 +213,7 @@
         function init() {
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x091124);
-            scene.fog = new THREE.FogExp2(0x091124, 0.01);
+            scene.fog = new THREE.FogExp2(0x091124, 0.0085);
 
             camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.rotation.order = 'YXZ';
@@ -221,7 +223,7 @@
             renderer.shadowMap.enabled = true;
             document.body.appendChild(renderer.domElement);
 
-            scene.add(new THREE.HemisphereLight(0x38bdf8, 0x1e293b, 0.8));
+            scene.add(new THREE.HemisphereLight(0x38bdf8, 0x1e293b, 0.85));
             const sunLight = new THREE.DirectionalLight(0xfbbf24, 1.5);
             sunLight.position.set(50, 90, 40);
             sunLight.castShadow = true;
@@ -242,84 +244,189 @@
             setLobbyCamera();
         }
 
+        // Helper para criar plataformas e rampas onde o jogador consegue andar por cima
+        function addWalkableBox(x, y, z, w, h, d, mat) {
+            const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+            mesh.position.set(x, y, z);
+            mesh.receiveShadow = true;
+            scene.add(mesh);
+            walkableSurfaces.push({
+                minX: x - w / 2, maxX: x + w / 2,
+                minZ: z - d / 2, maxZ: z + d / 2,
+                getHeight: () => y + h / 2
+            });
+            return mesh;
+        }
+
+        function addRamp(x, z, w, length, yStart, yEnd, axis, dir, mat) {
+            const heightDiff = yEnd - yStart;
+            const angle = Math.atan2(heightDiff, length);
+            const hyp = Math.hypot(length, heightDiff);
+            const geom = axis === 'z' ? new THREE.BoxGeometry(w, 0.4, hyp) : new THREE.BoxGeometry(hyp, 0.4, w);
+            const mesh = new THREE.Mesh(geom, mat);
+            mesh.position.set(x, (yStart + yEnd) / 2 - 0.15, z);
+            if (axis === 'z') mesh.rotation.x = dir > 0 ? -angle : angle;
+            else mesh.rotation.z = dir > 0 ? angle : -angle;
+            scene.add(mesh);
+
+            // Balizadores laterais luminosos na rampa para facilitar visualização
+            const stripMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b });
+            const stripGeom = axis === 'z' ? new THREE.BoxGeometry(0.15, 0.2, hyp) : new THREE.BoxGeometry(hyp, 0.2, 0.15);
+            [-w / 2 + 0.1, w / 2 - 0.1].forEach(offset => {
+                const strip = new THREE.Mesh(stripGeom, stripMat);
+                strip.position.set(axis === 'z' ? x + offset : x, (yStart + yEnd) / 2 + 0.1, axis === 'z' ? z : z + offset);
+                if (axis === 'z') strip.rotation.x = dir > 0 ? -angle : angle;
+                else strip.rotation.z = dir > 0 ? angle : -angle;
+                scene.add(strip);
+            });
+
+            walkableSurfaces.push({
+                minX: axis === 'z' ? x - w / 2 : x - length / 2,
+                maxX: axis === 'z' ? x + w / 2 : x + length / 2,
+                minZ: axis === 'z' ? z - length / 2 : z - w / 2,
+                maxZ: axis === 'z' ? z + length / 2 : z + w / 2,
+                getHeight: (px, pz) => {
+                    let t = axis === 'z' ? (pz - (z - length / 2)) / length : (px - (x - length / 2)) / length;
+                    t = Math.max(0, Math.min(1, t));
+                    if (dir < 0) t = 1 - t;
+                    return yStart + t * heightDiff;
+                }
+            });
+        }
+
+        function addSolidWall(x, y, z, w, h, d, mat) {
+            const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+            mesh.position.set(x, y, z);
+            scene.add(mesh);
+            obstacles.push(new THREE.Box3(
+                new THREE.Vector3(x - w / 2, y - h / 2, z - d / 2),
+                new THREE.Vector3(x + w / 2, y + h / 2, z + d / 2)
+            ));
+            return mesh;
+        }
+
         function buildEnvironment() {
-            // Chão Industrial e Passarelas Principais
-            const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: 0x131c2e, roughness: 0.8 }));
-            floor.rotation.x = -Math.PI / 2;
-            floor.receiveShadow = true;
-            scene.add(floor);
+            const floor = new THREE.Mesh(new THREE.PlaneGeometry(220, 220), new THREE.MeshStandardMaterial({ color: 0x131c2e, roughness: 0.8 }));
+            floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
 
-            const grid = new THREE.GridHelper(200, 50, 0xf59e0b, 0x223047);
-            grid.position.y = 0.02;
-            scene.add(grid);
+            const grid = new THREE.GridHelper(220, 55, 0xf59e0b, 0x223047);
+            grid.position.y = 0.02; scene.add(grid);
 
-            // Passarelas em Cruz no Chão com Balizadores LED
-            const roadMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 });
-            const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(10, 190), roadMat);
-            roadNS.rotation.x = -Math.PI / 2; roadNS.position.y = 0.03; scene.add(roadNS);
-
-            const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(190, 10), roadMat);
-            roadEW.rotation.x = -Math.PI / 2; roadEW.position.y = 0.03; scene.add(roadEW);
-
-            const ledMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
-            for (let i = -80; i <= 80; i += 20) {
-                if (Math.abs(i) < 10) continue;
-                [[-5.2, i], [5.2, i], [i, -5.2], [i, 5.2]].forEach(([lx, lz]) => {
-                    const post = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.8, 0.25), ledMat);
-                    post.position.set(lx, 0.4, lz);
-                    scene.add(post);
-                });
-            }
-
-            // Muros Perimetrais e Torres de Vigia nos 4 Cantos
+            // Muros Perimetrais
             const wallMat = new THREE.MeshStandardMaterial({ color: 0x0f172a });
             const trimMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b });
-            [{ x: 0, z: -100, w: 200, d: 2 }, { x: 0, z: 100, w: 200, d: 2 }, { x: -100, z: 0, w: 2, d: 200 }, { x: 100, z: 0, w: 2, d: 200 }].forEach(p => {
-                const wall = new THREE.Mesh(new THREE.BoxGeometry(p.w, 15, p.d), wallMat);
-                wall.position.set(p.x, 7.5, p.z); scene.add(wall);
+            [{ x: 0, z: -110, w: 220, d: 2 }, { x: 0, z: 110, w: 220, d: 2 }, { x: -110, z: 0, w: 2, d: 220 }, { x: 110, z: 0, w: 2, d: 220 }].forEach(p => {
+                addSolidWall(p.x, 8, p.z, p.w, 16, p.d, wallMat);
                 const trim = new THREE.Mesh(new THREE.BoxGeometry(p.w, 0.35, p.d + 0.2), trimMat);
-                trim.position.set(p.x, 12, p.z); scene.add(trim);
-                obstacles.push(new THREE.Box3().setFromObject(wall));
+                trim.position.set(p.x, 14, p.z); scene.add(trim);
             });
 
-            // 1. TORRE CENTRAL HELIOTÉRMICA SOLARIS + BASE ELEVADA
-            const towerGroup = new THREE.Group();
-            towerGroup.position.set(0, 0, -32);
-            const platform = new THREE.Mesh(new THREE.CylinderGeometry(8.5, 9.5, 1.4, 24), new THREE.MeshStandardMaterial({ color: 0x334155 }));
-            platform.position.y = 0.7; towerGroup.add(platform);
+            const deckMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.5, roughness: 0.4 });
+            const rampMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 });
+            const houseWallMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 });
+            const roofMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.7 });
+            const railMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
 
-            const towerBase = new THREE.Mesh(new THREE.CylinderGeometry(3.4, 4.8, 24, 16), new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8 }));
-            towerBase.position.y = 12; towerGroup.add(towerBase);
+            // ==========================================================
+            // 1. TORRE CENTRAL HELIOTÉRMICA COM DECK SUBÍVEL
+            // ==========================================================
+            const towerBase = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 4.2, 26, 16), new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8 }));
+            towerBase.position.set(0, 13, -36); scene.add(towerBase);
+            obstacles.push(new THREE.Box3(new THREE.Vector3(-3.2, 0, -39.2), new THREE.Vector3(3.2, 26, -32.8)));
+
+            // Plataforma circular/quadrada em volta da Torre Central (altura 4.5m) + Rampa de subida!
+            addWalkableBox(0, 4.25, -36, 18, 0.5, 18, deckMat);
+            addRamp(0, -19.5, 4.5, 15, 0, 4.5, 'z', -1, rampMat); // Sobe indo para o Norte (-Z)
 
             const receiver = new THREE.Mesh(new THREE.CylinderGeometry(3.8, 3.8, 4.8, 20), new THREE.MeshBasicMaterial({ color: 0xfbbf24 }));
-            receiver.position.y = 26; towerGroup.add(receiver);
+            receiver.position.set(0, 28, -36); scene.add(receiver);
 
-            const ring1 = new THREE.Mesh(new THREE.TorusGeometry(6.0, 0.2, 12, 36), new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
-            ring1.position.y = 26; towerGroup.add(ring1);
+            const ring1 = new THREE.Mesh(new THREE.TorusGeometry(6.2, 0.2, 12, 36), railMat);
+            ring1.position.set(0, 28, -36); scene.add(ring1);
             animatedProps.push({ mesh: ring1, rotX: 0.7, rotY: 1.1 });
 
-            const ring2 = new THREE.Mesh(new THREE.TorusGeometry(7.2, 0.15, 12, 36), new THREE.MeshBasicMaterial({ color: 0xf59e0b }));
-            ring2.position.y = 26; towerGroup.add(ring2);
-            animatedProps.push({ mesh: ring2, rotX: -0.9, rotY: 0.6 });
+            // ==========================================================
+            // 2. 4 TORRES DE VIGIA ESCALÁVEIS COM RAMPAS E PARAPEITOS
+            // ==========================================================
+            const watchTowers = [
+                { x: -65, z: -65, rampDirZ: 1 },
+                { x: 65, z: -65, rampDirZ: 1 },
+                { x: -65, z: 65, rampDirZ: -1 },
+                { x: 65, z: 65, rampDirZ: -1 }
+            ];
 
-            scene.add(towerGroup);
-            obstacles.push(new THREE.Box3(new THREE.Vector3(-8.5, 0, -40.5), new THREE.Vector3(8.5, 28, -23.5)));
+            watchTowers.forEach(t => {
+                const topH = 6.5;
+                // Pilares de sustentação
+                [[-5, -5], [5, -5], [-5, 5], [5, 5]].forEach(([px, pz]) => {
+                    const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.8, topH, 0.8), deckMat);
+                    pillar.position.set(t.x + px, topH / 2, t.z + pz); scene.add(pillar);
+                });
+                // Piso do topo da torre (12x12m)
+                addWalkableBox(t.x, topH - 0.25, t.z, 12, 0.5, 12, deckMat);
 
-            // 2. SUBESTAÇÃO DE ALTA TENSÃO (Lado Oeste e Leste)
-            const subMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.7 });
-            const coilMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
-            [[-55, -15], [-55, 15], [55, -15], [55, 15]].forEach(([sx, sz]) => {
-                const sub = new THREE.Group();
-                sub.position.set(sx, 0, sz);
-                const box = new THREE.Mesh(new THREE.BoxGeometry(5, 4.2, 5), subMat);
-                box.position.y = 2.1; sub.add(box);
-                const coil = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 3.5, 16), coilMat);
-                coil.position.y = 5.8; sub.add(coil);
-                scene.add(sub);
-                obstacles.push(new THREE.Box3(new THREE.Vector3(sx - 2.6, 0, sz - 2.6), new THREE.Vector3(sx + 2.6, 7.5, sz + 2.6)));
+                // Parapeitos de proteção no topo (deixando abertura para a rampa)
+                addSolidWall(t.x - 5.8, topH + 0.6, t.z, 0.4, 1.2, 12, houseWallMat);
+                addSolidWall(t.x + 5.8, topH + 0.6, t.z, 0.4, 1.2, 12, houseWallMat);
+                addSolidWall(t.x, topH + 0.6, t.z - (5.8 * t.rampDirZ), 12, 1.2, 0.4, houseWallMat);
+
+                // Luz neon no topo da torre
+                const beacon = new THREE.Mesh(new THREE.BoxGeometry(12.2, 0.2, 12.2), railMat);
+                beacon.position.set(t.x, topH - 0.1, t.z); scene.add(beacon);
+
+                // Rampa longa para subir até o topo
+                const rampZ = t.z + (15 * t.rampDirZ);
+                addRamp(t.x, rampZ, 4.0, 18, 0, topH, 'z', -t.rampDirZ, rampMat);
             });
 
-            // 3. RASTREADORES SOLARES (Fileiras táticas)
+            // ==========================================================
+            // 3. 2 CASAS / GALPÕES TÁTICOS ENTRÁVEIS (COM TELHADO SUBÍVEL)
+            // ==========================================================
+            const houses = [
+                { x: -42, z: 0 },
+                { x: 42, z: 0 }
+            ];
+
+            houses.forEach(h => {
+                const w = 16, d = 20, wallH = 5.5;
+                // Piso interno elevado levemente
+                addWalkableBox(h.x, 0.1, h.z, w, 0.2, d, deckMat);
+
+                // Paredes Leste e Oeste com janelas abertas no meio (você pode atirar pelas janelas!)
+                [-w / 2 + 0.3, w / 2 - 0.3].forEach(wx => {
+                    addSolidWall(h.x + wx, wallH / 2, h.z - 6, 0.6, wallH, 8, houseWallMat); // Parede Norte
+                    addSolidWall(h.x + wx, wallH / 2, h.z + 6, 0.6, wallH, 8, houseWallMat); // Parede Sul
+                    addSolidWall(h.x + wx, 0.9, h.z, 0.6, 1.8, 4, houseWallMat); // Peitoril da janela
+                    addSolidWall(h.x + wx, 4.6, h.z, 0.6, 1.8, 4, houseWallMat); // Verga da janela
+                });
+
+                // Paredes Norte e Sul com portas largas de 5m no centro para você entrar
+                [-d / 2 + 0.3, d / 2 - 0.3].forEach(wz => {
+                    addSolidWall(h.x - 5.25, wallH / 2, h.z + wz, 5.5, wallH, 0.6, houseWallMat);
+                    addSolidWall(h.x + 5.25, wallH / 2, h.z + wz, 5.5, wallH, 0.6, houseWallMat);
+                    addSolidWall(h.x, 4.6, h.z + wz, 5.0, 1.8, 0.6, houseWallMat); // Cima da porta
+                });
+
+                // Laje do Telhado (você pode subir no telhado da casa pela rampa lateral!)
+                addWalkableBox(h.x, wallH + 0.25, h.z, w + 1, 0.5, d + 1, roofMat);
+                const roofTrim = new THREE.Mesh(new THREE.BoxGeometry(w + 1.2, 0.2, d + 1.2), trimMat);
+                roofTrim.position.set(h.x, wallH + 0.3, h.z); scene.add(roofTrim);
+
+                // Rampa lateral externa para subir no telhado da casa
+                const sideDir = h.x < 0 ? -1 : 1;
+                addRamp(h.x + (10.5 * sideDir), h.z, 3.5, 14, 0, wallH + 0.5, 'x', -sideDir, rampMat);
+            });
+
+            // ==========================================================
+            // 4. PONTE AÉREA LIGANDO AS TORRES NORTE
+            // ==========================================================
+            addWalkableBox(0, 6.25, -65, 118, 0.5, 4.5, deckMat);
+            const bridgeNeon = new THREE.Mesh(new THREE.BoxGeometry(118, 0.15, 4.7), railMat);
+            bridgeNeon.position.set(0, 6.2, -65); scene.add(bridgeNeon);
+
+            // ==========================================================
+            // 5. RASTREADORES SOLARES & BUNKERS DE COBERTURA NO PÁTIO
+            // ==========================================================
             const canvas = document.createElement('canvas');
             canvas.width = 128; canvas.height = 128;
             const ctx = canvas.getContext('2d');
@@ -332,7 +439,7 @@
             const panelMat = new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(canvas), metalness: 0.65, roughness: 0.15 });
             const steelMat = new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.85 });
 
-            [[-22, -16], [22, -16], [-24, 22], [24, 22], [-42, -52], [42, -52], [-42, 52], [42, 52], [-20, -68], [20, -68], [-20, 68], [20, 68]].forEach(([x, z], idx) => {
+            [[-22, 22], [22, 22], [-22, 46], [22, 46], [-24, -85], [24, -85], [-24, 85], [24, 85]].forEach(([x, z], idx) => {
                 const tracker = new THREE.Group();
                 tracker.position.set(x, 0, z);
                 const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.55, 2.6, 12), steelMat);
@@ -344,15 +451,11 @@
                 obstacles.push(new THREE.Box3(new THREE.Vector3(x - 4.1, 0, z - 2.6), new THREE.Vector3(x + 4.1, 3.8, z + 2.6)));
             });
 
-            // 4. BUNKERS / CAIXAS DE BATERIA SOLAR (Coberturas rápidas no centro)
-            const crateMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 });
-            const crateGlow = new THREE.MeshBasicMaterial({ color: 0xf59e0b });
-            [[-12, 12], [12, 12], [-14, -6], [14, -6], [0, 26], [0, 48]].forEach(([bx, bz]) => {
-                const crate = new THREE.Mesh(new THREE.BoxGeometry(3.2, 1.8, 2.2), crateMat);
-                crate.position.set(bx, 0.9, bz); scene.add(crate);
-                const strip = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.18, 2.3), crateGlow);
+            // Caixas de cobertura tática
+            [[-12, 10], [12, 10], [0, 28], [-15, -48], [15, -48]].forEach(([bx, bz]) => {
+                addSolidWall(bx, 0.9, bz, 3.2, 1.8, 2.2, houseWallMat);
+                const strip = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.18, 2.3), trimMat);
                 strip.position.set(bx, 1.4, bz); scene.add(strip);
-                obstacles.push(new THREE.Box3().setFromObject(crate));
             });
         }
 
@@ -424,11 +527,15 @@
             myPeerId = 'SOLARIS-' + randomNum;
 
             peer = new Peer(myPeerId, {
+                host: '0.peerjs.com',
+                port: 443,
+                path: '/',
+                secure: true,
                 config: {
                     iceServers: [
                         { urls: 'stun:stun.l.google.com:19302' },
                         { urls: 'stun:stun1.l.google.com:19302' },
-                        { urls: 'stun:stun2.l.google.com:19302' }
+                        { urls: 'stun:global.stun.twilio.com:3478' }
                     ]
                 }
             });
@@ -437,6 +544,7 @@
                 document.getElementById('my-room-code').innerText = id;
                 document.getElementById('online-badge').innerText = '● P2P PRONTO';
                 document.getElementById('online-badge').style.color = '#22c55e';
+                document.getElementById('mp-status').innerText = 'Aguardando jogadores (1/4)...';
             });
 
             peer.on('connection', (conn) => {
@@ -447,14 +555,14 @@
             peer.on('disconnected', () => {
                 document.getElementById('online-badge').innerText = '● RECONECTANDO...';
                 document.getElementById('online-badge').style.color = '#f59e0b';
-                peer.reconnect();
+                setTimeout(() => { if (peer && !peer.destroyed) peer.reconnect(); }, 3000);
             });
 
             peer.on('error', (err) => {
                 if (err.type === 'peer-unavailable') {
                     document.getElementById('mp-status').innerText = '❌ Sala não encontrada! Confira o código.';
                 } else {
-                    document.getElementById('mp-status').innerText = '❌ Erro de rede: ' + err.type;
+                    document.getElementById('mp-status').innerText = '⚠️ Rede restrita para P2P (' + err.type + ')';
                 }
             });
         }
@@ -468,7 +576,7 @@
 
             const timeout = setTimeout(() => {
                 if (!conn.open) {
-                    document.getElementById('mp-status').innerText = '❌ Tempo esgotado. Rede bloqueando P2P ou código expirado.';
+                    document.getElementById('mp-status').innerText = '❌ Tempo esgotado. Verifique o código ou rede.';
                 }
             }, 8000);
 
@@ -551,7 +659,7 @@
         }
 
         function startMatch() {
-            player.hp = 100; player.score = 0;
+            player.hp = 100; player.score = 0; player.velocityY = 0;
             document.getElementById('hp').innerText = '100%';
             document.getElementById('score').innerText = '0';
             enemies.forEach(e => scene.remove(e.mesh)); enemies.length = 0;
@@ -561,9 +669,9 @@
             lobbyAgent.group.visible = false;
             fpsGunMesh.visible = true;
             camera.fov = 75; camera.updateProjectionMatrix();
-            const spawns = [[-32, 32], [32, 32], [-32, -32], [32, -32]];
+            const spawns = [[-25, 30], [25, 30], [-42, 0], [42, 0]];
             const sp = spawns[Math.floor(Math.random() * spawns.length)];
-            camera.position.set(sp[0], player.height, sp[1]);
+            camera.position.set(sp[0], player.height + 0.5, sp[1]);
             camera.rotation.set(0, 0, 0);
 
             document.getElementById('lobby-ui').style.display = 'none';
@@ -598,8 +706,8 @@
             eye.position.set(0, 0.2, 0.85); droneGroup.add(eye);
 
             let ex, ez;
-            do { ex = (Math.random() - 0.5) * 170; ez = (Math.random() - 0.5) * 170; } while (Math.hypot(ex - camera.position.x, ez - camera.position.z) < 30);
-            droneGroup.position.set(ex, 2.0, ez);
+            do { ex = (Math.random() - 0.5) * 180; ez = (Math.random() - 0.5) * 180; } while (Math.hypot(ex - camera.position.x, ez - camera.position.z) < 30);
+            droneGroup.position.set(ex, 2.2, ez);
             scene.add(droneGroup);
             enemies.push({ mesh: droneGroup, hp: 2, speed: 6 });
         }
@@ -668,8 +776,28 @@
             }, 50);
         }
 
+        // Calcula o piso mais alto sob os pés do jogador (chão, rampa, torre ou telhado da casa)
+        function getGroundHeight(x, z, currentFeetY) {
+            let maxGround = 0;
+            for (const surf of walkableSurfaces) {
+                if (x >= surf.minX - 0.3 && x <= surf.maxX + 0.3 && z >= surf.minZ - 0.3 && z <= surf.maxZ + 0.3) {
+                    const h = surf.getHeight(x, z);
+                    // Só pisa na superfície se ela estiver abaixo ou no máximo 0.85m acima dos pés (para subir degraus/rampas)
+                    if (h <= currentFeetY + 0.85 && h > maxGround) {
+                        maxGround = h;
+                    }
+                }
+            }
+            return maxGround;
+        }
+
         function checkCollision(pos) {
-            const box = new THREE.Box3(new THREE.Vector3(pos.x - 0.6, pos.y - player.height, pos.z - 0.6), new THREE.Vector3(pos.x + 0.6, pos.y + 0.3, pos.z + 0.6));
+            const feetY = pos.y - player.height + 0.4; // Tolerância nos pés para subir rampas
+            const headY = pos.y + 0.2;
+            const box = new THREE.Box3(
+                new THREE.Vector3(pos.x - 0.55, feetY, pos.z - 0.55),
+                new THREE.Vector3(pos.x + 0.55, headY, pos.z + 0.55)
+            );
             return obstacles.some(b => box.intersectsBox(b));
         }
 
@@ -708,9 +836,21 @@
                 const nextZ = camera.position.clone().addScaledVector(new THREE.Vector3(0, 0, dir.z), player.speed * delta);
                 if (!checkCollision(nextZ)) camera.position.z = nextZ.z;
 
+                // Física vertical com suporte a rampas, torres, pontes e telhados
+                const currentFeetY = camera.position.y - player.height;
+                const groundY = getGroundHeight(camera.position.x, camera.position.z, currentFeetY);
+                const targetEyeY = groundY + player.height;
+
                 player.velocityY -= 28 * delta;
                 camera.position.y += player.velocityY * delta;
-                if (camera.position.y <= player.height) { camera.position.y = player.height; player.velocityY = 0; player.isGrounded = true; }
+
+                if (camera.position.y <= targetEyeY) {
+                    camera.position.y = targetEyeY;
+                    player.velocityY = 0;
+                    player.isGrounded = true;
+                } else {
+                    player.isGrounded = false;
+                }
 
                 if (gunRecoil > 0) { fpsGunMesh.position.z = -0.65 + gunRecoil; gunRecoil = Math.max(0, gunRecoil - delta * 1.2); }
 
@@ -727,20 +867,27 @@
                     b.life -= delta;
                     let hit = false;
 
-                    for (let j = enemies.length - 1; j >= 0; j--) {
-                        if (b.mesh.position.distanceTo(enemies[j].mesh.position) < 1.5) {
-                            enemies[j].hp--; hit = true;
-                            if (enemies[j].hp <= 0) {
-                                scene.remove(enemies[j].mesh); enemies.splice(j, 1);
-                                if (b.ownerId === 'LOCAL') {
-                                    player.score++; player.credits += 50;
-                                    document.getElementById('score').innerText = player.score;
-                                    document.getElementById('lobby-credits').innerText = player.credits;
-                                    addKillFeed('⚡ Drone destruído (+50 kWh)');
-                                    if (player.score > player.bestScore) { player.bestScore = player.score; document.getElementById('best-score').innerText = player.bestScore; }
+                    // Colisão da bala com paredes e casas
+                    if (obstacles.some(box => box.containsPoint(b.mesh.position))) {
+                        hit = true;
+                    }
+
+                    if (!hit) {
+                        for (let j = enemies.length - 1; j >= 0; j--) {
+                            if (b.mesh.position.distanceTo(enemies[j].mesh.position) < 1.5) {
+                                enemies[j].hp--; hit = true;
+                                if (enemies[j].hp <= 0) {
+                                    scene.remove(enemies[j].mesh); enemies.splice(j, 1);
+                                    if (b.ownerId === 'LOCAL') {
+                                        player.score++; player.credits += 50;
+                                        document.getElementById('score').innerText = player.score;
+                                        document.getElementById('lobby-credits').innerText = player.credits;
+                                        addKillFeed('⚡ Drone destruído (+50 kWh)');
+                                        if (player.score > player.bestScore) { player.bestScore = player.score; document.getElementById('best-score').innerText = player.bestScore; }
+                                    }
                                 }
+                                break;
                             }
-                            break;
                         }
                     }
 
@@ -758,7 +905,10 @@
                 for (let i = enemies.length - 1; i >= 0; i--) {
                     const e = enemies[i];
                     e.mesh.lookAt(camera.position.x, e.mesh.position.y, camera.position.z);
-                    e.mesh.position.y = 2.0 + Math.sin(time * 0.005 + i) * 0.3;
+                    // Drones voam acompanhando suavemente a altura do jogador (atacam até nas torres!)
+                    const targetDroneY = Math.max(2.0, camera.position.y - 0.3 + Math.sin(time * 0.005 + i) * 0.3);
+                    e.mesh.position.y += (targetDroneY - e.mesh.position.y) * 2 * delta;
+
                     const toPlayer = new THREE.Vector3().subVectors(camera.position, e.mesh.position); toPlayer.y = 0;
                     if (toPlayer.length() > 2.2) e.mesh.position.addScaledVector(toPlayer.normalize(), e.speed * delta);
                     else { takeDamage(15); scene.remove(e.mesh); enemies.splice(i, 1); }
