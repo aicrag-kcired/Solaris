@@ -498,22 +498,30 @@
             scene.add(camera);
         }
 
-        function initMultiplayer() {
-            const randomNum = Math.floor(1000 + Math.random() * 9000);
-            myPeerId = 'SOLARIS-' + randomNum;
-            currentRoomTopic = 'solaris-overdrive-arena/sala/' + myPeerId;
+        function connectBroker(brokers, index) {
+            if (index >= brokers.length) {
+                document.getElementById('online-badge').innerText = '● BLOQUEADO';
+                document.getElementById('online-badge').style.color = '#ef4444';
+                document.getElementById('mp-status').innerText = '❌ Rede escolar bloqueou WebSockets externos.';
+                return;
+            }
 
-            document.getElementById('my-room-code').innerText = myPeerId;
-            document.getElementById('online-badge').innerText = '● CONECTANDO WSS...';
-            document.getElementById('online-badge').style.color = '#f59e0b';
+            if (mqttClient) { try { mqttClient.end(true); } catch (e) {} }
+            let connected = false;
 
-            mqttClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt', {
+            mqttClient = mqtt.connect(brokers[index], {
                 clientId: myPeerId + '-' + Math.floor(Math.random() * 1000),
                 clean: true,
-                reconnectPeriod: 3000
+                reconnectPeriod: 0
             });
 
+            const fallbackTimer = setTimeout(() => {
+                if (!connected) connectBroker(brokers, index + 1);
+            }, 4000);
+
             mqttClient.on('connect', () => {
+                connected = true;
+                clearTimeout(fallbackTimer);
                 document.getElementById('online-badge').innerText = '● ONLINE (WSS)';
                 document.getElementById('online-badge').style.color = '#22c55e';
                 document.getElementById('mp-status').innerText = 'Sala pronta! Passe o código para seu amigo.';
@@ -537,10 +545,29 @@
             });
 
             mqttClient.on('error', () => {
-                document.getElementById('online-badge').innerText = '● BLOQUEADO';
-                document.getElementById('online-badge').style.color = '#ef4444';
-                document.getElementById('mp-status').innerText = '❌ Rede escolar bloqueou WebSocket externo.';
+                if (!connected) {
+                    clearTimeout(fallbackTimer);
+                    connectBroker(brokers, index + 1);
+                }
             });
+        }
+
+        function initMultiplayer() {
+            const randomNum = Math.floor(1000 + Math.random() * 9000);
+            myPeerId = 'SOLARIS-' + randomNum;
+            currentRoomTopic = 'solaris-overdrive-arena/sala/' + myPeerId;
+
+            document.getElementById('my-room-code').innerText = myPeerId;
+            document.getElementById('online-badge').innerText = '● CONECTANDO...';
+            document.getElementById('online-badge').style.color = '#f59e0b';
+
+            // Tenta múltiplos brokers públicos em sequência (incluindo porta 443 padrão)
+            const brokers = [
+                'wss://broker.hivemq.com:8884/mqtt',
+                'wss://test.mosquitto.org:8081/mqtt',
+                'wss://broker.emqx.io:8084/mqtt'
+            ];
+            connectBroker(brokers, 0);
 
             setInterval(() => {
                 const now = Date.now();
