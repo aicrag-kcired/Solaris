@@ -3,400 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solaris Overdrive 3D - Online Multiplayer</title>
+    <title>Solaris Overdrive 3D - Arena Tática</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-        body {
-            overflow: hidden;
-            background-color: #070b14;
-            color: #f8fafc;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; font-family: 'Segoe UI', Roboto, Arial, sans-serif; }
+        body { overflow: hidden; background-color: #070b14; color: #f8fafc; }
 
-        /* --- LOBBY ESTILO CS2 --- */
         #lobby-ui {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            z-index: 10;
-            background: radial-gradient(circle at center, transparent 40%, rgba(7, 11, 20, 0.85) 100%);
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: space-between;
+            z-index: 10; background: radial-gradient(circle at center, transparent 40%, rgba(7, 11, 20, 0.85) 100%);
         }
-
         .cs-topbar {
-            height: 64px;
-            background: rgba(15, 23, 42, 0.88);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 30px;
+            height: 64px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex;
+            align-items: center; justify-content: space-between; padding: 0 30px;
         }
-        .cs-icon-btn {
-            color: #94a3b8;
-            text-decoration: none;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
+        .cs-icon-btn { color: #94a3b8; text-decoration: none; font-size: 15px; font-weight: bold; }
         .cs-icon-btn:hover { color: #f59e0b; }
-
-        .cs-tabs {
-            display: flex;
-            gap: 35px;
-            height: 100%;
-            align-items: center;
-        }
+        .cs-tabs { display: flex; gap: 35px; height: 100%; align-items: center; }
         .cs-tab {
-            font-size: 17px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            color: #94a3b8;
-            cursor: pointer;
-            height: 100%;
-            display: flex;
-            align-items: center;
+            font-size: 17px; font-weight: 700; letter-spacing: 1.5px; color: #94a3b8;
+            cursor: pointer; height: 100%; display: flex; align-items: center;
             border-bottom: 3px solid transparent;
-            transition: all 0.2s;
         }
-        .cs-tab:hover { color: #fff; }
-        .cs-tab.active {
-            color: #f59e0b;
-            border-bottom: 3px solid #f59e0b;
-            text-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
-        }
+        .cs-tab.active { color: #f59e0b; border-bottom: 3px solid #f59e0b; }
 
-        /* Painel Multiplayer Online no Lobby */
         .mp-box {
-            position: absolute;
-            top: 90px;
-            right: 95px;
-            width: 310px;
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(56, 189, 248, 0.4);
-            border-radius: 6px;
-            padding: 16px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            position: absolute; top: 90px; right: 95px; width: 310px;
+            background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(56, 189, 248, 0.4);
+            border-radius: 6px; padding: 16px;
         }
-        .mp-box h3 {
-            font-size: 14px;
-            color: #38bdf8;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+        .mp-box h3 { font-size: 14px; color: #38bdf8; margin-bottom: 10px; display: flex; justify-content: space-between; }
         .room-code-display {
-            background: #090e1a;
-            border: 1px dashed #f59e0b;
-            padding: 8px 12px;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            font-family: monospace;
-            font-size: 15px;
-            color: #f59e0b;
-            font-weight: bold;
+            background: #090e1a; border: 1px dashed #f59e0b; padding: 8px 12px;
+            border-radius: 4px; display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px; font-family: monospace; font-size: 15px; color: #f59e0b; font-weight: bold;
         }
-        .copy-btn {
-            background: #f59e0b;
-            color: #090e1a;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 3px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .join-row {
-            display: flex;
-            gap: 6px;
-        }
-        .join-input {
-            flex: 1;
-            background: #090e1a;
-            border: 1px solid #334155;
-            color: #fff;
-            padding: 8px;
-            border-radius: 4px;
-            font-size: 13px;
-            text-transform: uppercase;
-            user-select: text;
-        }
-        .join-btn {
-            background: #38bdf8;
-            color: #090e1a;
-            border: none;
-            padding: 0 14px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 12px;
-            cursor: pointer;
-        }
-        .join-btn:hover { background: #7dd3fc; }
-        #mp-status {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-top: 8px;
-        }
+        .copy-btn { background: #f59e0b; color: #090e1a; border: none; padding: 4px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .join-row { display: flex; gap: 6px; }
+        .join-input { flex: 1; background: #090e1a; border: 1px solid #334155; color: #fff; padding: 8px; border-radius: 4px; font-size: 13px; text-transform: uppercase; user-select: text; }
+        .join-btn { background: #38bdf8; color: #090e1a; border: none; padding: 0 14px; border-radius: 4px; font-weight: bold; font-size: 12px; cursor: pointer; }
+        #mp-status { font-size: 12px; color: #94a3b8; margin-top: 8px; }
 
-        /* Barra Lateral Direita */
         .cs-sidebar {
-            position: absolute;
-            top: 64px;
-            right: 0;
-            width: 72px;
-            height: calc(100% - 64px);
-            background: rgba(15, 23, 42, 0.88);
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 15px;
-            gap: 14px;
+            position: absolute; top: 64px; right: 0; width: 72px; height: calc(100% - 64px);
+            background: rgba(15, 23, 42, 0.88); border-left: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex; flex-direction: column; align-items: center; padding-top: 15px; gap: 14px;
         }
         .friend-avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 4px;
-            background: #1e293b;
-            border-left: 3px solid #22c55e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-            position: relative;
+            width: 44px; height: 44px; border-radius: 4px; background: #1e293b;
+            border-left: 3px solid #22c55e; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 14px;
         }
-
-        /* Painéis Esquerdos (Arsenal / Missões) */
         .cs-panel {
-            position: absolute;
-            top: 90px;
-            left: 40px;
-            width: 330px;
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(245, 158, 11, 0.35);
-            border-radius: 6px;
-            padding: 20px;
-            display: none;
+            position: absolute; top: 90px; left: 40px; width: 330px;
+            background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(245, 158, 11, 0.35);
+            border-radius: 6px; padding: 20px; display: none;
         }
         .cs-panel.visible { display: block; }
-        .cs-panel h2 {
-            font-size: 16px;
-            color: #f59e0b;
-            margin-bottom: 14px;
-            letter-spacing: 1px;
-        }
+        .cs-panel h2 { font-size: 16px; color: #f59e0b; margin-bottom: 14px; }
         .skin-option {
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid #334155;
-            padding: 12px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
+            background: rgba(30, 41, 59, 0.8); border: 1px solid #334155; padding: 12px;
+            border-radius: 5px; margin-bottom: 10px; cursor: pointer; display: flex; justify-content: space-between; font-size: 14px;
         }
-        .skin-option.selected {
-            border-color: #f59e0b;
-            background: rgba(245, 158, 11, 0.18);
-        }
+        .skin-option.selected { border-color: #f59e0b; background: rgba(245, 158, 11, 0.18); }
 
-        /* Cartão Inferior + Botão JOGAR */
         .player-card-bottom {
-            position: absolute;
-            bottom: 30px;
-            left: calc(50% - 36px);
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
+            position: absolute; bottom: 30px; left: calc(50% - 36px); transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
         }
         .player-badge {
-            background: rgba(15, 23, 42, 0.92);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 8px 20px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 8px 20px; border-radius: 4px; display: flex; align-items: center; gap: 12px;
         }
         .rank-icon {
-            width: 30px; height: 30px;
-            background: linear-gradient(135deg, #f59e0b, #b45309);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; color: #090e1a;
+            width: 30px; height: 30px; background: linear-gradient(135deg, #f59e0b, #b45309);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #090e1a;
         }
         .play-btn-cs {
-            background: linear-gradient(180deg, #22c55e, #16a34a);
-            color: #fff;
-            border: none;
-            padding: 14px 54px;
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            border-radius: 4px;
-            cursor: pointer;
-            box-shadow: 0 0 25px rgba(34, 197, 94, 0.5);
-            transition: transform 0.15s;
+            background: linear-gradient(180deg, #22c55e, #16a34a); color: #fff; border: none;
+            padding: 14px 54px; font-size: 20px; font-weight: 800; letter-spacing: 2px;
+            border-radius: 4px; cursor: pointer; box-shadow: 0 0 25px rgba(34, 197, 94, 0.5);
         }
-        .play-btn-cs:hover { transform: scale(1.04); }
 
-        /* --- HUD IN-GAME --- */
         #game-hud {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            display: none;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 25px;
-            z-index: 5;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+            display: none; flex-direction: column; justify-content: space-between; padding: 25px; z-index: 5;
         }
-        .top-bar-hud {
-            display: flex;
-            justify-content: space-between;
-        }
-        .stat-box {
-            background: rgba(11, 19, 43, 0.85);
-            border: 2px solid #f59e0b;
-            padding: 10px 22px;
-            border-radius: 6px;
-            font-size: 18px;
-            font-weight: bold;
-        }
+        .top-bar-hud { display: flex; justify-content: space-between; }
+        .stat-box { background: rgba(11, 19, 43, 0.85); border: 2px solid #f59e0b; padding: 10px 22px; border-radius: 6px; font-size: 18px; font-weight: bold; }
         .stat-box span { color: #f59e0b; }
-        #crosshair {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 22px; height: 22px;
-            transform: translate(-50%, -50%);
-        }
-        #crosshair::before, #crosshair::after {
-            content: '';
-            position: absolute;
-            background: #22c55e;
-            box-shadow: 0 0 6px #22c55e;
-        }
+        #crosshair { position: absolute; top: 50%; left: 50%; width: 22px; height: 22px; transform: translate(-50%, -50%); }
+        #crosshair::before, #crosshair::after { content: ''; position: absolute; background: #22c55e; }
         #crosshair::before { top: 10px; left: 0; width: 22px; height: 2px; }
         #crosshair::after { top: 0; left: 10px; width: 2px; height: 22px; }
-
-        #kill-feed {
-            position: absolute;
-            top: 80px; right: 25px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            align-items: flex-end;
-        }
-        .kill-msg {
-            background: rgba(15, 23, 42, 0.85);
-            border-right: 3px solid #f59e0b;
-            padding: 6px 12px;
-            font-size: 13px;
-            border-radius: 3px;
-        }
-
+        #kill-feed { position: absolute; top: 80px; right: 25px; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+        .kill-msg { background: rgba(15, 23, 42, 0.85); border-right: 3px solid #f59e0b; padding: 6px 12px; font-size: 13px; border-radius: 3px; }
         #damage-flash {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle, transparent 50%, rgba(239, 68, 68, 0.65) 100%);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.15s;
-            z-index: 4;
+            opacity: 0; pointer-events: none; transition: opacity 0.15s; z-index: 4;
         }
     </style>
 </head>
 <body>
-
     <div id="damage-flash"></div>
-
-    <!-- INTERFACE DO LOBBY ESTILO CS2 -->
     <div id="lobby-ui">
         <div class="cs-topbar">
             <a href="inicio.html" class="cs-icon-btn">⏻ VOLTAR AO SITE SOLARIS</a>
             <div class="cs-tabs">
                 <div class="cs-tab" onclick="switchTab('inventario', this)">ARSENAL</div>
                 <div class="cs-tab active" onclick="switchTab('jogar', this)">JOGAR</div>
-                <div class="cs-tab" onclick="switchTab('missoes', this)">OPERACÃO SOLAR</div>
+                <div class="cs-tab" onclick="switchTab('missoes', this)">MAPA & MISSÃO</div>
             </div>
             <div style="color: #f59e0b; font-weight: bold;">⚡ <span id="lobby-credits">1250</span> kWh</div>
         </div>
 
-        <!-- Painel de Arsenal -->
         <div id="panel-inventario" class="cs-panel">
             <h2>TRAJE & RIFLE DE PLASMA</h2>
             <div class="skin-option selected" onclick="selectSkin('solar', this)">
-                <span>☀️ Solaris Gold (Armadura)</span>
-                <span style="color: #f59e0b;">EQUIPADO</span>
+                <span>☀️ Solaris Gold (Armadura)</span><span style="color: #f59e0b;">EQUIPADO</span>
             </div>
             <div class="skin-option" onclick="selectSkin('voltaic', this)">
-                <span>💠 Célula Fotovoltaica</span>
-                <span style="color: #38bdf8;">DISPONÍVEL</span>
+                <span>💠 Célula Fotovoltaica</span><span style="color: #38bdf8;">DISPONÍVEL</span>
             </div>
             <div class="skin-option" onclick="selectSkin('overdrive', this)">
-                <span>🔥 Reator Térmico</span>
-                <span style="color: #ef4444;">DISPONÍVEL</span>
+                <span>🔥 Reator Térmico</span><span style="color: #ef4444;">DISPONÍVEL</span>
             </div>
-            <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">
-                Clique e arraste no centro para girar o Guardião 3D.
-            </p>
         </div>
 
-        <!-- Painel de Missões -->
         <div id="panel-missoes" class="cs-panel">
-            <h2>USINA HELIOTÉRMICA SOLARIS</h2>
-            <p style="font-size: 13px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px;">
-                Defenda a Torre Central de Energia contra os Drones de Apagão ou enfrente outros Guardiões no modo Online PvP!
+            <h2>COMPLEXO SOLARIS SECTOR-07</h2>
+            <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 12px;">
+                Arena completa com Torre Heliotérmica, Subestação de Alta Tensão, Rastreadores Solares e Bunkers de Energia.
             </p>
-            <div style="font-size: 13px; color: #22c55e;">✔ Recorde na Sessão: <span id="best-score">0</span> Abates</div>
+            <div style="font-size: 13px; color: #22c55e;">✔ Recorde: <span id="best-score">0</span> Abates</div>
         </div>
 
-        <!-- Painel Multiplayer Online (PeerJS) -->
         <div class="mp-box">
-            <h3>
-                <span>🌐 MULTIPLAYER ONLINE</span>
-                <span id="online-badge" style="color: #22c55e; font-size: 11px;">● P2P ATIVO</span>
-            </h3>
-            <div style="font-size: 11px; color: #94a3b8; margin-bottom: 4px;">SEU CÓDIGO DE SALA (ENVIE A UM AMIGO):</div>
+            <h3><span>🌐 MULTIPLAYER ONLINE</span><span id="online-badge" style="color: #f59e0b; font-size: 11px;">● INICIANDO...</span></h3>
+            <div style="font-size: 11px; color: #94a3b8; margin-bottom: 4px;">SEU CÓDIGO DE SALA:</div>
             <div class="room-code-display">
                 <span id="my-room-code">GERANDO...</span>
                 <button class="copy-btn" onclick="copyRoomCode()">COPIAR</button>
             </div>
-            <div style="font-size: 11px; color: #94a3b8; margin-bottom: 4px;">OU ENTRE NA SALA DE UM AMIGO:</div>
+            <div style="font-size: 11px; color: #94a3b8; margin-bottom: 4px;">ENTRAR NA SALA DE UM AMIGO:</div>
             <div class="join-row">
                 <input type="text" id="join-code-input" class="join-input" placeholder="EX: SOLARIS-1234">
                 <button class="join-btn" onclick="connectToFriend()">CONECTAR</button>
             </div>
-            <div id="mp-status">Aguardando jogadores na sala (1/4)...</div>
+            <div id="mp-status">Aguardando jogadores (1/4)...</div>
         </div>
 
-        <!-- Barra Lateral Direita -->
         <div class="cs-sidebar" id="online-players-list">
             <div style="font-size: 10px; color: #94a3b8; font-weight: bold;">SALA</div>
-            <div class="friend-avatar" title="Você">TU</div>
+            <div class="friend-avatar">TU</div>
         </div>
 
-        <!-- Cartão Inferior + Botão JOGAR -->
         <div class="player-card-bottom">
             <div class="player-badge">
                 <div class="rank-icon">☀</div>
@@ -409,7 +172,6 @@
         </div>
     </div>
 
-    <!-- HUD DURANTE A PARTIDA -->
     <div id="game-hud">
         <div class="top-bar-hud">
             <div class="stat-box">ENERGIA DO TRAJE: <span id="hp">100%</span></div>
@@ -417,12 +179,10 @@
         </div>
         <div id="kill-feed"></div>
         <div id="crosshair"></div>
-        <div style="color: #cbd5e1; font-size: 13px; text-align: center; text-shadow: 0 1px 4px #000;">
-            WASD: Mover | ESPAÇO: Pular | CLIQUE: Disparar Plasma | ESC: Voltar ao Lobby
+        <div style="color: #cbd5e1; font-size: 13px; text-align: center;">
+            WASD: Mover | ESPAÇO: Pular | CLIQUE: Atirar | ESC: Voltar ao Lobby
         </div>
     </div>
-
-    <!-- Three.js + PeerJS (Multiplayer Online P2P) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
@@ -431,34 +191,15 @@
         let gameState = 'LOBBY';
         let prevTime = performance.now();
 
-        const player = {
-            height: 2.3,
-            speed: 15,
-            jumpForce: 11.5,
-            velocityY: 0,
-            isGrounded: true,
-            hp: 100,
-            score: 0,
-            bestScore: 0,
-            credits: 1250
-        };
-
+        const player = { height: 2.3, speed: 15, jumpForce: 11.5, velocityY: 0, isGrounded: true, hp: 100, score: 0, bestScore: 0, credits: 1250 };
         let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
-        const obstacles = [];
-        const bullets = [];
-        const enemies = [];
-        const animatedProps = []; // Anéis da torre e rastreadores solares
+        const obstacles = [], bullets = [], enemies = [], animatedProps = [];
 
-        // Objetos do Personagem e Armas
         let lobbyAgent, fpsGunMesh, fpsGunCore, fpsGunBarrel;
-        let gunRecoil = 0;
-        let isDraggingLobby = false, prevMouseX = 0;
+        let gunRecoil = 0, isDraggingLobby = false, prevMouseX = 0;
 
-        // Multiplayer Online (PeerJS)
-        let peer = null;
-        let myPeerId = '';
-        const connections = {}; // peerId -> DataConnection
-        const remotePlayers = {}; // peerId -> { mesh, leftLeg, rightLeg, targetPos, targetRotY, hp }
+        let peer = null, myPeerId = '';
+        const connections = {}, remotePlayers = {};
 
         const skins = {
             solar: { armor: 0xf59e0b, core: 0xfbbf24, visor: 0x38bdf8 },
@@ -467,14 +208,10 @@
         };
         let currentSkin = 'solar';
 
-        init();
-        initMultiplayer();
-        animate();
-
         function init() {
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x0b132b);
-            scene.fog = new THREE.FogExp2(0x0b132b, 0.011);
+            scene.background = new THREE.Color(0x091124);
+            scene.fog = new THREE.FogExp2(0x091124, 0.01);
 
             camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.rotation.order = 'YXZ';
@@ -482,40 +219,21 @@
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             document.body.appendChild(renderer.domElement);
 
-            // Iluminação Melhorada
-            const hemiLight = new THREE.HemisphereLight(0x38bdf8, 0x1e293b, 0.7);
-            scene.add(hemiLight);
-
-            const sunLight = new THREE.DirectionalLight(0xfbbf24, 1.6);
-            sunLight.position.set(45, 85, 35);
+            scene.add(new THREE.HemisphereLight(0x38bdf8, 0x1e293b, 0.8));
+            const sunLight = new THREE.DirectionalLight(0xfbbf24, 1.5);
+            sunLight.position.set(50, 90, 40);
             sunLight.castShadow = true;
-            sunLight.shadow.mapSize.width = 2048;
-            sunLight.shadow.mapSize.height = 2048;
-            sunLight.shadow.camera.near = 10;
-            sunLight.shadow.camera.far = 220;
-            const d = 85;
-            sunLight.shadow.camera.left = -d;
-            sunLight.shadow.camera.right = d;
-            sunLight.shadow.camera.top = d;
-            sunLight.shadow.camera.bottom = -d;
             scene.add(sunLight);
 
-            // Disco Solar no Céu
-            const sunDisc = new THREE.Mesh(
-                new THREE.SphereGeometry(10, 32, 32),
-                new THREE.MeshBasicMaterial({ color: 0xfde047 })
-            );
-            sunDisc.position.set(90, 140, -120);
+            const sunDisc = new THREE.Mesh(new THREE.SphereGeometry(11, 32, 32), new THREE.MeshBasicMaterial({ color: 0xfde047 }));
+            sunDisc.position.set(95, 145, -130);
             scene.add(sunDisc);
 
             buildEnvironment();
 
-            // Criar Personagem Detalhado do Lobby
             lobbyAgent = createDetailedCharacterMesh(currentSkin);
-            lobbyAgent.group.position.set(0, 0, 0);
             lobbyAgent.group.rotation.y = 0.25;
             scene.add(lobbyAgent.group);
 
@@ -524,324 +242,220 @@
             setLobbyCamera();
         }
 
-        // --- CONSTRUÇÃO DO CENÁRIO COMPLEXO DA USINA SOLAR ---
         function buildEnvironment() {
-            // Chão texturizado com placas de concreto e linhas de energia
-            const floorGeo = new THREE.PlaneGeometry(180, 180);
-            const floorMat = new THREE.MeshStandardMaterial({ color: 0x162032, roughness: 0.75, metalness: 0.2 });
-            const floor = new THREE.Mesh(floorGeo, floorMat);
+            // Chão Industrial e Passarelas Principais
+            const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: 0x131c2e, roughness: 0.8 }));
             floor.rotation.x = -Math.PI / 2;
             floor.receiveShadow = true;
             scene.add(floor);
 
-            const grid = new THREE.GridHelper(180, 45, 0xf59e0b, 0x26354d);
+            const grid = new THREE.GridHelper(200, 50, 0xf59e0b, 0x223047);
             grid.position.y = 0.02;
             scene.add(grid);
 
-            // Muros Perimetrais Futuristas
-            const wallMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5, metalness: 0.7 });
-            const neonTrimMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b });
-            [
-                { x: 0, z: -90, w: 180, d: 2 },
-                { x: 0, z: 90, w: 180, d: 2 },
-                { x: -90, z: 0, w: 2, d: 180 },
-                { x: 90, z: 0, w: 2, d: 180 }
-            ].forEach(p => {
-                const wall = new THREE.Mesh(new THREE.BoxGeometry(p.w, 14, p.d), wallMat);
-                wall.position.set(p.x, 7, p.z);
-                wall.receiveShadow = true;
-                scene.add(wall);
+            // Passarelas em Cruz no Chão com Balizadores LED
+            const roadMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 });
+            const roadNS = new THREE.Mesh(new THREE.PlaneGeometry(10, 190), roadMat);
+            roadNS.rotation.x = -Math.PI / 2; roadNS.position.y = 0.03; scene.add(roadNS);
 
-                const trim = new THREE.Mesh(new THREE.BoxGeometry(p.w, 0.3, p.d + 0.2), neonTrimMat);
-                trim.position.set(p.x, 11, p.z);
-                scene.add(trim);
+            const roadEW = new THREE.Mesh(new THREE.PlaneGeometry(190, 10), roadMat);
+            roadEW.rotation.x = -Math.PI / 2; roadEW.position.y = 0.03; scene.add(roadEW);
 
+            const ledMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+            for (let i = -80; i <= 80; i += 20) {
+                if (Math.abs(i) < 10) continue;
+                [[-5.2, i], [5.2, i], [i, -5.2], [i, 5.2]].forEach(([lx, lz]) => {
+                    const post = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.8, 0.25), ledMat);
+                    post.position.set(lx, 0.4, lz);
+                    scene.add(post);
+                });
+            }
+
+            // Muros Perimetrais e Torres de Vigia nos 4 Cantos
+            const wallMat = new THREE.MeshStandardMaterial({ color: 0x0f172a });
+            const trimMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b });
+            [{ x: 0, z: -100, w: 200, d: 2 }, { x: 0, z: 100, w: 200, d: 2 }, { x: -100, z: 0, w: 2, d: 200 }, { x: 100, z: 0, w: 2, d: 200 }].forEach(p => {
+                const wall = new THREE.Mesh(new THREE.BoxGeometry(p.w, 15, p.d), wallMat);
+                wall.position.set(p.x, 7.5, p.z); scene.add(wall);
+                const trim = new THREE.Mesh(new THREE.BoxGeometry(p.w, 0.35, p.d + 0.2), trimMat);
+                trim.position.set(p.x, 12, p.z); scene.add(trim);
                 obstacles.push(new THREE.Box3().setFromObject(wall));
             });
 
-            // 1. TORRE CENTRAL HELIOTÉRMICA SOLARIS (Ponto central do mapa)
+            // 1. TORRE CENTRAL HELIOTÉRMICA SOLARIS + BASE ELEVADA
             const towerGroup = new THREE.Group();
-            towerGroup.position.set(0, 0, -28);
+            towerGroup.position.set(0, 0, -32);
+            const platform = new THREE.Mesh(new THREE.CylinderGeometry(8.5, 9.5, 1.4, 24), new THREE.MeshStandardMaterial({ color: 0x334155 }));
+            platform.position.y = 0.7; towerGroup.add(platform);
 
-            const towerBase = new THREE.Mesh(
-                new THREE.CylinderGeometry(3.2, 4.5, 22, 16),
-                new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8, roughness: 0.3 })
-            );
-            towerBase.position.y = 11;
-            towerBase.castShadow = true;
-            towerBase.receiveShadow = true;
-            towerGroup.add(towerBase);
+            const towerBase = new THREE.Mesh(new THREE.CylinderGeometry(3.4, 4.8, 24, 16), new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8 }));
+            towerBase.position.y = 12; towerGroup.add(towerBase);
 
-            // Receptor Incandescente no topo da Torre
-            const solarReceiver = new THREE.Mesh(
-                new THREE.CylinderGeometry(3.6, 3.6, 4.5, 20),
-                new THREE.MeshBasicMaterial({ color: 0xfbbf24 })
-            );
-            solarReceiver.position.y = 24;
-            towerGroup.add(solarReceiver);
+            const receiver = new THREE.Mesh(new THREE.CylinderGeometry(3.8, 3.8, 4.8, 20), new THREE.MeshBasicMaterial({ color: 0xfbbf24 }));
+            receiver.position.y = 26; towerGroup.add(receiver);
 
-            // Anéis de energia giratórios
-            const ring1 = new THREE.Mesh(
-                new THREE.TorusGeometry(5.5, 0.18, 12, 36),
-                new THREE.MeshBasicMaterial({ color: 0x38bdf8 })
-            );
-            ring1.position.y = 24;
-            towerGroup.add(ring1);
-            animatedProps.push({ mesh: ring1, rotX: 0.8, rotY: 1.2 });
+            const ring1 = new THREE.Mesh(new THREE.TorusGeometry(6.0, 0.2, 12, 36), new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
+            ring1.position.y = 26; towerGroup.add(ring1);
+            animatedProps.push({ mesh: ring1, rotX: 0.7, rotY: 1.1 });
+
+            const ring2 = new THREE.Mesh(new THREE.TorusGeometry(7.2, 0.15, 12, 36), new THREE.MeshBasicMaterial({ color: 0xf59e0b }));
+            ring2.position.y = 26; towerGroup.add(ring2);
+            animatedProps.push({ mesh: ring2, rotX: -0.9, rotY: 0.6 });
 
             scene.add(towerGroup);
-            obstacles.push(new THREE.Box3(new THREE.Vector3(-4.2, 0, -32.2), new THREE.Vector3(4.2, 26, -23.8)));
+            obstacles.push(new THREE.Box3(new THREE.Vector3(-8.5, 0, -40.5), new THREE.Vector3(8.5, 28, -23.5)));
 
-            // 2. RASTREADORES SOLARES (Inspirados no rastreador-solar.jpg do projeto)
+            // 2. SUBESTAÇÃO DE ALTA TENSÃO (Lado Oeste e Leste)
+            const subMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.7 });
+            const coilMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+            [[-55, -15], [-55, 15], [55, -15], [55, 15]].forEach(([sx, sz]) => {
+                const sub = new THREE.Group();
+                sub.position.set(sx, 0, sz);
+                const box = new THREE.Mesh(new THREE.BoxGeometry(5, 4.2, 5), subMat);
+                box.position.y = 2.1; sub.add(box);
+                const coil = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 3.5, 16), coilMat);
+                coil.position.y = 5.8; sub.add(coil);
+                scene.add(sub);
+                obstacles.push(new THREE.Box3(new THREE.Vector3(sx - 2.6, 0, sz - 2.6), new THREE.Vector3(sx + 2.6, 7.5, sz + 2.6)));
+            });
+
+            // 3. RASTREADORES SOLARES (Fileiras táticas)
             const canvas = document.createElement('canvas');
             canvas.width = 128; canvas.height = 128;
             const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#0369a1';
-            ctx.fillRect(0, 0, 128, 128);
-            ctx.strokeStyle = '#bae6fd';
-            ctx.lineWidth = 2;
+            ctx.fillStyle = '#0369a1'; ctx.fillRect(0, 0, 128, 128);
+            ctx.strokeStyle = '#bae6fd'; ctx.lineWidth = 2;
             for (let i = 0; i <= 128; i += 32) {
                 ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 128); ctx.stroke();
                 ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(128, i); ctx.stroke();
             }
-            const panelTex = new THREE.CanvasTexture(canvas);
-            const panelMat = new THREE.MeshStandardMaterial({ map: panelTex, metalness: 0.65, roughness: 0.15 });
-            const steelMat = new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.85, roughness: 0.3 });
+            const panelMat = new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(canvas), metalness: 0.65, roughness: 0.15 });
+            const steelMat = new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.85 });
 
-            const trackerCoords = [
-                [-18, -15], [18, -15], [-26, 18], [26, 18],
-                [-48, -28], [48, -28], [-48, 35], [48, 35],
-                [0, 32], [-22, -55], [22, -55], [0, 62]
-            ];
-
-            trackerCoords.forEach(([x, z], idx) => {
+            [[-22, -16], [22, -16], [-24, 22], [24, 22], [-42, -52], [42, -52], [-42, 52], [42, 52], [-20, -68], [20, -68], [-20, 68], [20, 68]].forEach(([x, z], idx) => {
                 const tracker = new THREE.Group();
                 tracker.position.set(x, 0, z);
-
-                // Sapata de concreto
-                const concrete = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.4, 2.4), steelMat);
-                concrete.position.y = 0.2;
-                tracker.add(concrete);
-
-                // Mastro hidráulico central
                 const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.55, 2.6, 12), steelMat);
-                mast.position.y = 1.4;
-                mast.castShadow = true;
-                tracker.add(mast);
-
-                // Mesa articulada com 6 módulos fotovoltaicos
+                mast.position.y = 1.4; tracker.add(mast);
                 const panelHead = new THREE.Mesh(new THREE.BoxGeometry(8.2, 0.28, 5.2), panelMat);
-                panelHead.position.y = 2.8;
-                panelHead.rotation.x = 0.35;
-                panelHead.castShadow = true;
-                panelHead.receiveShadow = true;
-                tracker.add(panelHead);
-
+                panelHead.position.y = 2.8; panelHead.rotation.x = 0.35; tracker.add(panelHead);
                 scene.add(tracker);
                 animatedProps.push({ mesh: panelHead, sway: true, offset: idx });
-
-                obstacles.push(new THREE.Box3(
-                    new THREE.Vector3(x - 4.1, 0, z - 2.6),
-                    new THREE.Vector3(x + 4.1, 3.8, z + 2.6)
-                ));
+                obstacles.push(new THREE.Box3(new THREE.Vector3(x - 4.1, 0, z - 2.6), new THREE.Vector3(x + 4.1, 3.8, z + 2.6)));
             });
 
-            // 3. CONTAINERS INVERSORES DE ENERGIA (Coberturas altas)
-            const invMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.6, roughness: 0.4 });
-            [[-35, 0], [35, 0], [0, -65]].forEach(([x, z]) => {
-                const container = new THREE.Mesh(new THREE.BoxGeometry(6, 3.6, 10), invMat);
-                container.position.set(x, 1.8, z);
-                container.castShadow = true;
-                container.receiveShadow = true;
-                scene.add(container);
-
-                // Led indicador de status
-                const led = new THREE.Mesh(
-                    new THREE.BoxGeometry(6.1, 0.25, 9.6),
-                    new THREE.MeshBasicMaterial({ color: 0x22c55e })
-                );
-                led.position.set(x, 3.2, z);
-                scene.add(led);
-
-                obstacles.push(new THREE.Box3().setFromObject(container));
+            // 4. BUNKERS / CAIXAS DE BATERIA SOLAR (Coberturas rápidas no centro)
+            const crateMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 });
+            const crateGlow = new THREE.MeshBasicMaterial({ color: 0xf59e0b });
+            [[-12, 12], [12, 12], [-14, -6], [14, -6], [0, 26], [0, 48]].forEach(([bx, bz]) => {
+                const crate = new THREE.Mesh(new THREE.BoxGeometry(3.2, 1.8, 2.2), crateMat);
+                crate.position.set(bx, 0.9, bz); scene.add(crate);
+                const strip = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.18, 2.3), crateGlow);
+                strip.position.set(bx, 1.4, bz); scene.add(strip);
+                obstacles.push(new THREE.Box3().setFromObject(crate));
             });
         }
 
-        // --- PERSONAGEM 3D ARTICULADO E DETALHADO ---
         function createDetailedCharacterMesh(skinKey) {
             const group = new THREE.Group();
-            const colors = skins[skinKey] || skins.solar;
+            const c = skins[skinKey] || skins.solar;
+            const darkSuit = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.5 });
+            const armorMat = new THREE.MeshStandardMaterial({ color: c.armor, roughness: 0.25, metalness: 0.75 });
+            const visorMat = new THREE.MeshBasicMaterial({ color: c.visor });
+            const coreMat = new THREE.MeshBasicMaterial({ color: c.core });
 
-            const darkSuit = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.5, metalness: 0.4 });
-            const armorMat = new THREE.MeshStandardMaterial({ color: colors.armor, roughness: 0.25, metalness: 0.75 });
-            const visorMat = new THREE.MeshBasicMaterial({ color: colors.visor });
-            const coreMat = new THREE.MeshBasicMaterial({ color: colors.core });
-
-            // Perna Esquerda + Bota + Joelheira
             const leftLeg = new THREE.Group();
             leftLeg.position.set(-0.22, 1.1, 0);
-            const lThigh = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.95, 0.3), darkSuit);
-            lThigh.position.y = -0.47;
-            lThigh.castShadow = true;
-            leftLeg.add(lThigh);
-            const lKnee = new THREE.Mesh(new THREE.BoxGeometry(0.31, 0.22, 0.34), armorMat);
-            lKnee.position.set(0, -0.45, 0.03);
-            leftLeg.add(lKnee);
-            const lBoot = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.25, 0.42), armorMat);
-            lBoot.position.set(0, -0.98, 0.05);
-            leftLeg.add(lBoot);
+            const lThigh = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.95, 0.3), darkSuit); lThigh.position.y = -0.47; leftLeg.add(lThigh);
+            const lBoot = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.25, 0.42), armorMat); lBoot.position.set(0, -0.98, 0.05); leftLeg.add(lBoot);
             group.add(leftLeg);
 
-            // Perna Direita + Bota + Joelheira
             const rightLeg = new THREE.Group();
             rightLeg.position.set(0.22, 1.1, 0);
-            const rThigh = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.95, 0.3), darkSuit);
-            rThigh.position.y = -0.47;
-            rThigh.castShadow = true;
-            rightLeg.add(rThigh);
-            const rKnee = new THREE.Mesh(new THREE.BoxGeometry(0.31, 0.22, 0.34), armorMat);
-            rKnee.position.set(0, -0.45, 0.03);
-            rightLeg.add(rKnee);
-            const rBoot = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.25, 0.42), armorMat);
-            rBoot.position.set(0, -0.98, 0.05);
-            rightLeg.add(rBoot);
+            const rThigh = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.95, 0.3), darkSuit); rThigh.position.y = -0.47; rightLeg.add(rThigh);
+            const rBoot = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.25, 0.42), armorMat); rBoot.position.set(0, -0.98, 0.05); rightLeg.add(rBoot);
             group.add(rightLeg);
 
-            // Tronco + Peitoral Blindado
-            const torso = new THREE.Mesh(new THREE.BoxGeometry(0.82, 1.1, 0.46), darkSuit);
-            torso.position.set(0, 1.65, 0);
-            torso.castShadow = true;
-            group.add(torso);
-
-            const chest = new THREE.Mesh(new THREE.BoxGeometry(0.86, 0.68, 0.52), armorMat);
-            chest.position.set(0, 1.82, 0);
-            chest.castShadow = true;
-            group.add(chest);
-
-            // Reator Peitoral
-            const chestCore = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.55, 16), coreMat);
-            chestCore.rotation.x = Math.PI / 2;
-            chestCore.position.set(0, 1.85, 0.02);
-            group.add(chestCore);
-
-            // Mochila Geradora Solar nas costas
-            const backpack = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.72, 0.28), darkSuit);
-            backpack.position.set(0, 1.78, -0.34);
-            group.add(backpack);
+            const torso = new THREE.Mesh(new THREE.BoxGeometry(0.82, 1.1, 0.46), darkSuit); torso.position.set(0, 1.65, 0); group.add(torso);
+            const chest = new THREE.Mesh(new THREE.BoxGeometry(0.86, 0.68, 0.52), armorMat); chest.position.set(0, 1.82, 0); group.add(chest);
 
             const backBattery = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.58, 16), coreMat);
-            backBattery.position.set(0, 1.78, -0.46);
-            group.add(backBattery);
+            backBattery.position.set(0, 1.78, -0.42); group.add(backBattery);
 
-            // Capacete Tático + Visor
-            const head = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.5, 0.52), armorMat);
-            head.position.set(0, 2.52, 0);
-            head.castShadow = true;
-            group.add(head);
-
-            const visor = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.18, 0.55), visorMat);
-            visor.position.set(0, 2.55, 0.02);
-            group.add(visor);
-
-            // Ombreiras Blindadas + Braços
-            const leftShoulder = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.32, 0.38), armorMat);
-            leftShoulder.position.set(-0.56, 2.05, 0);
-            group.add(leftShoulder);
-
-            const rightShoulder = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.32, 0.38), armorMat);
-            rightShoulder.position.set(0.56, 2.05, 0);
-            group.add(rightShoulder);
+            const head = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.5, 0.52), armorMat); head.position.set(0, 2.52, 0); group.add(head);
+            const visor = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.18, 0.55), visorMat); visor.position.set(0, 2.55, 0.02); group.add(visor);
 
             const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.75, 0.22), darkSuit);
-            leftArm.position.set(-0.54, 1.72, 0.24);
-            leftArm.rotation.x = -0.85;
-            leftArm.rotation.z = -0.35;
-            group.add(leftArm);
+            leftArm.position.set(-0.54, 1.72, 0.24); leftArm.rotation.x = -0.85; leftArm.rotation.z = -0.35; group.add(leftArm);
 
             const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.75, 0.22), darkSuit);
-            rightArm.position.set(0.54, 1.72, 0.18);
-            rightArm.rotation.x = -0.75;
-            rightArm.rotation.z = 0.2;
-            group.add(rightArm);
+            rightArm.position.set(0.54, 1.72, 0.18); rightArm.rotation.x = -0.75; rightArm.rotation.z = 0.2; group.add(rightArm);
 
-            // Rifle de Plasma nas mãos
             const gun = new THREE.Group();
-            const gunBody = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.22, 1.15), darkSuit);
-            gun.add(gunBody);
-
+            gun.add(new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.22, 1.15), darkSuit));
             const gunCore = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.75, 16), coreMat);
-            gunCore.rotation.x = Math.PI / 2;
-            gunCore.position.set(0, 0.08, 0.05);
-            gun.add(gunCore);
+            gunCore.rotation.x = Math.PI / 2; gunCore.position.set(0, 0.08, 0.05); gun.add(gunCore);
+            gun.position.set(0.1, 1.54, 0.46); gun.rotation.y = -0.45; group.add(gun);
 
-            const gunBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.45, 12), visorMat);
-            gunBarrel.rotation.x = Math.PI / 2;
-            gunBarrel.position.set(0, 0.04, 0.7);
-            gun.add(gunBarrel);
-
-            gun.position.set(0.1, 1.54, 0.46);
-            gun.rotation.y = -0.45;
-            group.add(gun);
-
-            // Pedestal do Lobby
             const pedestal = new THREE.Mesh(
                 new THREE.CylinderGeometry(1.15, 1.3, 0.08, 32),
-                new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: colors.armor, emissiveIntensity: 0.25 })
+                new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: c.armor, emissiveIntensity: 0.25 })
             );
-            pedestal.position.y = 0.04;
-            group.add(pedestal);
+            pedestal.position.y = 0.04; group.add(pedestal);
 
             return { group, leftLeg, rightLeg, armorMat, visorMat, coreMat, pedestal };
         }
 
         function createFPSRifle() {
             fpsGunMesh = new THREE.Group();
-            const body = new THREE.Mesh(
-                new THREE.BoxGeometry(0.16, 0.22, 0.9),
-                new THREE.MeshStandardMaterial({ color: 0x111827, metalness: 0.8 })
-            );
-            fpsGunMesh.add(body);
-
-            fpsGunCore = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.055, 0.055, 0.65, 16),
-                new THREE.MeshBasicMaterial({ color: skins[currentSkin].core })
-            );
-            fpsGunCore.rotation.x = Math.PI / 2;
-            fpsGunCore.position.set(0, 0.08, -0.1);
-            fpsGunMesh.add(fpsGunCore);
-
-            fpsGunBarrel = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.03, 0.03, 0.45, 12),
-                new THREE.MeshBasicMaterial({ color: skins[currentSkin].visor })
-            );
-            fpsGunBarrel.rotation.x = Math.PI / 2;
-            fpsGunBarrel.position.set(0, 0.04, -0.55);
-            fpsGunMesh.add(fpsGunBarrel);
+            fpsGunMesh.add(new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.22, 0.9), new THREE.MeshStandardMaterial({ color: 0x111827 })));
+            fpsGunCore = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.65, 16), new THREE.MeshBasicMaterial({ color: skins[currentSkin].core }));
+            fpsGunCore.rotation.x = Math.PI / 2; fpsGunCore.position.set(0, 0.08, -0.1); fpsGunMesh.add(fpsGunCore);
+            fpsGunBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.45, 12), new THREE.MeshBasicMaterial({ color: skins[currentSkin].visor }));
+            fpsGunBarrel.rotation.x = Math.PI / 2; fpsGunBarrel.position.set(0, 0.04, -0.55); fpsGunMesh.add(fpsGunBarrel);
 
             fpsGunMesh.position.set(0.34, -0.32, -0.65);
             fpsGunMesh.visible = false;
             camera.add(fpsGunMesh);
             scene.add(camera);
         }
-
-        // --- SISTEMA MULTIPLAYER ONLINE (PEERJS / WEBRTC) ---
         function initMultiplayer() {
             const randomNum = Math.floor(1000 + Math.random() * 9000);
             myPeerId = 'SOLARIS-' + randomNum;
 
-            peer = new Peer(myPeerId);
+            peer = new Peer(myPeerId, {
+                config: {
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' },
+                        { urls: 'stun:stun2.l.google.com:19302' }
+                    ]
+                }
+            });
 
             peer.on('open', (id) => {
                 document.getElementById('my-room-code').innerText = id;
+                document.getElementById('online-badge').innerText = '● P2P PRONTO';
+                document.getElementById('online-badge').style.color = '#22c55e';
             });
 
-            // Quando um amigo se conecta na sua sala
             peer.on('connection', (conn) => {
+                document.getElementById('mp-status').innerText = 'Recebendo jogador...';
                 setupConnection(conn);
             });
 
+            peer.on('disconnected', () => {
+                document.getElementById('online-badge').innerText = '● RECONECTANDO...';
+                document.getElementById('online-badge').style.color = '#f59e0b';
+                peer.reconnect();
+            });
+
             peer.on('error', (err) => {
-                document.getElementById('mp-status').innerText = 'Aviso P2P: ' + err.type;
+                if (err.type === 'peer-unavailable') {
+                    document.getElementById('mp-status').innerText = '❌ Sala não encontrada! Confira o código.';
+                } else {
+                    document.getElementById('mp-status').innerText = '❌ Erro de rede: ' + err.type;
+                }
             });
         }
 
@@ -850,7 +464,15 @@
             if (!friendCode || friendCode === myPeerId) return;
 
             document.getElementById('mp-status').innerText = 'Conectando a ' + friendCode + '...';
-            const conn = peer.connect(friendCode);
+            const conn = peer.connect(friendCode, { reliable: true });
+
+            const timeout = setTimeout(() => {
+                if (!conn.open) {
+                    document.getElementById('mp-status').innerText = '❌ Tempo esgotado. Rede bloqueando P2P ou código expirado.';
+                }
+            }, 8000);
+
+            conn.on('open', () => clearTimeout(timeout));
             setupConnection(conn);
         }
 
@@ -858,20 +480,10 @@
             conn.on('open', () => {
                 connections[conn.peer] = conn;
                 updateOnlineUI();
-
-                // Enviar estado inicial
-                conn.send({
-                    type: 'sync',
-                    skin: currentSkin,
-                    pos: camera.position,
-                    rotY: camera.rotation.y,
-                    inGame: gameState === 'PLAYING'
-                });
+                conn.send({ type: 'sync', skin: currentSkin, pos: camera.position, rotY: camera.rotation.y, inGame: gameState === 'PLAYING' });
             });
 
-            conn.on('data', (data) => {
-                handleNetworkData(conn.peer, data);
-            });
+            conn.on('data', (data) => handleNetworkData(conn.peer, data));
 
             conn.on('close', () => {
                 delete connections[conn.peer];
@@ -889,12 +501,7 @@
                     const char = createDetailedCharacterMesh(data.skin || 'solar');
                     char.pedestal.visible = false;
                     scene.add(char.group);
-                    remotePlayers[peerId] = {
-                        char,
-                        targetPos: new THREE.Vector3(0, 0, 0),
-                        targetRotY: 0,
-                        isMoving: false
-                    };
+                    remotePlayers[peerId] = { char, targetPos: new THREE.Vector3(), targetRotY: 0, isMoving: false };
                 }
                 const rp = remotePlayers[peerId];
                 rp.char.group.visible = data.inGame;
@@ -903,32 +510,23 @@
                     rp.isMoving = rp.targetPos.distanceTo(newPos) > 0.05;
                     rp.targetPos.copy(newPos);
                 }
-                rp.targetRotY = data.rotY + Math.PI; // Virar frente do modelo
+                rp.targetRotY = data.rotY + Math.PI;
             } else if (data.type === 'shoot') {
-                spawnBullet(
-                    new THREE.Vector3(data.origin.x, data.origin.y, data.origin.z),
-                    new THREE.Vector3(data.dir.x, data.dir.y, data.dir.z),
-                    data.color || 0x38bdf8,
-                    peerId
-                );
+                spawnBullet(new THREE.Vector3(data.origin.x, data.origin.y, data.origin.z), new THREE.Vector3(data.dir.x, data.dir.y, data.dir.z), data.color || 0x38bdf8, peerId);
             } else if (data.type === 'hit' && data.target === myPeerId) {
                 takeDamage(20, 'Guardião Rival');
             }
         }
 
         function broadcastData(payload) {
-            Object.values(connections).forEach(conn => {
-                if (conn.open) conn.send(payload);
-            });
+            Object.values(connections).forEach(conn => { if (conn.open) conn.send(payload); });
         }
 
         function updateOnlineUI() {
             const count = Object.keys(connections).length + 1;
             document.getElementById('mp-status').innerText = `Conectado! Jogadores na sala: ${count}/4`;
-
             const list = document.getElementById('online-players-list');
-            list.innerHTML = `<div style="font-size: 10px; color: #94a3b8; font-weight: bold;">SALA (${count})</div>
-                              <div class="friend-avatar" title="Você">TU</div>`;
+            list.innerHTML = `<div style="font-size: 10px; color: #94a3b8; font-weight: bold;">SALA (${count})</div><div class="friend-avatar">TU</div>`;
             Object.keys(connections).forEach((id, idx) => {
                 list.innerHTML += `<div class="friend-avatar" style="border-left-color:#38bdf8" title="${id}">P${idx + 2}</div>`;
             });
@@ -941,32 +539,31 @@
             setTimeout(() => btn.innerText = 'COPIAR', 1500);
         }
 
-        // --- CONTROLE DE LOBBY E PARTIDA ---
         function setLobbyCamera() {
             gameState = 'LOBBY';
             lobbyAgent.group.visible = true;
             fpsGunMesh.visible = false;
-            camera.fov = 50;
-            camera.updateProjectionMatrix();
-            camera.position.set(0.35, 1.75, 4.3);
-            camera.rotation.set(-0.04, 0, 0);
-
+            camera.fov = 50; camera.updateProjectionMatrix();
+            camera.position.set(0.35, 1.75, 4.3); camera.rotation.set(-0.04, 0, 0);
             document.getElementById('lobby-ui').style.display = 'flex';
             document.getElementById('game-hud').style.display = 'none';
             broadcastData({ type: 'sync', inGame: false });
         }
 
         function startMatch() {
-            resetMatchStats();
+            player.hp = 100; player.score = 0;
+            document.getElementById('hp').innerText = '100%';
+            document.getElementById('score').innerText = '0';
+            enemies.forEach(e => scene.remove(e.mesh)); enemies.length = 0;
+            bullets.forEach(b => scene.remove(b.mesh)); bullets.length = 0;
+
             gameState = 'PLAYING';
             lobbyAgent.group.visible = false;
             fpsGunMesh.visible = true;
-            camera.fov = 75;
-            camera.updateProjectionMatrix();
-
-            // Nascer em ponto aleatório seguro
-            const spawnAngle = Math.random() * Math.PI * 2;
-            camera.position.set(Math.cos(spawnAngle) * 14, player.height, Math.sin(spawnAngle) * 14);
+            camera.fov = 75; camera.updateProjectionMatrix();
+            const spawns = [[-32, 32], [32, 32], [-32, -32], [32, -32]];
+            const sp = spawns[Math.floor(Math.random() * spawns.length)];
+            camera.position.set(sp[0], player.height, sp[1]);
             camera.rotation.set(0, 0, 0);
 
             document.getElementById('lobby-ui').style.display = 'none';
@@ -985,220 +582,111 @@
 
         function selectSkin(skinKey, element) {
             currentSkin = skinKey;
-            document.querySelectorAll('.skin-option').forEach(el => {
-                el.classList.remove('selected');
-                el.lastElementChild.innerText = 'DISPONÍVEL';
-            });
-            element.classList.add('selected');
-            element.lastElementChild.innerText = 'EQUIPADO';
-
+            document.querySelectorAll('.skin-option').forEach(el => { el.classList.remove('selected'); el.lastElementChild.innerText = 'DISPONÍVEL'; });
+            element.classList.add('selected'); element.lastElementChild.innerText = 'EQUIPADO';
             const c = skins[skinKey];
-            lobbyAgent.armorMat.color.setHex(c.armor);
-            lobbyAgent.coreMat.color.setHex(c.core);
-            lobbyAgent.visorMat.color.setHex(c.visor);
-            lobbyAgent.pedestal.material.emissive.setHex(c.armor);
-
-            fpsGunCore.material.color.setHex(c.core);
-            fpsGunBarrel.material.color.setHex(c.visor);
+            lobbyAgent.armorMat.color.setHex(c.armor); lobbyAgent.coreMat.color.setHex(c.core); lobbyAgent.visorMat.color.setHex(c.visor);
+            fpsGunCore.material.color.setHex(c.core); fpsGunBarrel.material.color.setHex(c.visor);
         }
 
         function spawnEnemy() {
             if (gameState !== 'PLAYING' || enemies.length >= 8) return;
-
             const droneGroup = new THREE.Group();
-            const shell = new THREE.Mesh(
-                new THREE.SphereGeometry(1.1, 20, 20),
-                new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 0.3, metalness: 0.8 })
-            );
-            shell.scale.set(1, 1.25, 1);
-            droneGroup.add(shell);
-
-            const eye = new THREE.Mesh(
-                new THREE.SphereGeometry(0.45, 16, 16),
-                new THREE.MeshBasicMaterial({ color: 0xef4444 })
-            );
-            eye.position.set(0, 0.2, 0.85);
-            droneGroup.add(eye);
+            const shell = new THREE.Mesh(new THREE.SphereGeometry(1.1, 20, 20), new THREE.MeshStandardMaterial({ color: 0x090d16, metalness: 0.8 }));
+            shell.scale.set(1, 1.25, 1); droneGroup.add(shell);
+            const eye = new THREE.Mesh(new THREE.SphereGeometry(0.45, 16, 16), new THREE.MeshBasicMaterial({ color: 0xef4444 }));
+            eye.position.set(0, 0.2, 0.85); droneGroup.add(eye);
 
             let ex, ez;
-            do {
-                ex = (Math.random() - 0.5) * 150;
-                ez = (Math.random() - 0.5) * 150;
-            } while (Math.hypot(ex - camera.position.x, ez - camera.position.z) < 28);
-
+            do { ex = (Math.random() - 0.5) * 170; ez = (Math.random() - 0.5) * 170; } while (Math.hypot(ex - camera.position.x, ez - camera.position.z) < 30);
             droneGroup.position.set(ex, 2.0, ez);
             scene.add(droneGroup);
-            enemies.push({ mesh: droneGroup, hp: 2, speed: 5.5 + Math.random() * 2.5 });
+            enemies.push({ mesh: droneGroup, hp: 2, speed: 6 });
         }
 
         function shoot() {
             if (gameState !== 'PLAYING') return;
             gunRecoil = 0.15;
-
-            const startPos = new THREE.Vector3();
-            fpsGunMesh.getWorldPosition(startPos);
-
-            const direction = new THREE.Vector3();
-            camera.getWorldDirection(direction);
-
+            const startPos = new THREE.Vector3(); fpsGunMesh.getWorldPosition(startPos);
+            const direction = new THREE.Vector3(); camera.getWorldDirection(direction);
             const bulletColor = skins[currentSkin].core;
             spawnBullet(startPos, direction, bulletColor, 'LOCAL');
-
-            // Avisar jogadores online do disparo
-            broadcastData({
-                type: 'shoot',
-                origin: startPos,
-                dir: direction,
-                color: bulletColor
-            });
+            broadcastData({ type: 'shoot', origin: startPos, dir: direction, color: bulletColor });
         }
 
         function spawnBullet(origin, dir, colorHex, ownerId) {
-            const bullet = new THREE.Mesh(
-                new THREE.SphereGeometry(0.16, 8, 8),
-                new THREE.MeshBasicMaterial({ color: colorHex })
-            );
+            const bullet = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 8), new THREE.MeshBasicMaterial({ color: colorHex }));
             bullet.position.copy(origin);
             scene.add(bullet);
-            bullets.push({
-                mesh: bullet,
-                velocity: dir.clone().multiplyScalar(80),
-                life: 2.0,
-                ownerId
-            });
+            bullets.push({ mesh: bullet, velocity: dir.clone().multiplyScalar(85), life: 2.0, ownerId });
         }
 
         function addKillFeed(msg) {
             const feed = document.getElementById('kill-feed');
             const item = document.createElement('div');
-            item.className = 'kill-msg';
-            item.innerText = msg;
+            item.className = 'kill-msg'; item.innerText = msg;
             feed.appendChild(item);
             setTimeout(() => item.remove(), 3500);
         }
 
         function setupEvents() {
             document.getElementById('start-match-btn').addEventListener('click', startMatch);
-
             document.addEventListener('pointerlockchange', () => {
-                if (document.pointerLockElement !== document.body && gameState === 'PLAYING') {
-                    setLobbyCamera();
-                }
+                if (document.pointerLockElement !== document.body && gameState === 'PLAYING') setLobbyCamera();
             });
-
             document.addEventListener('mousedown', (e) => {
-                if (gameState === 'LOBBY') {
-                    isDraggingLobby = true;
-                    prevMouseX = e.clientX;
-                } else if (gameState === 'PLAYING' && e.button === 0) {
-                    shoot();
-                }
+                if (gameState === 'LOBBY') { isDraggingLobby = true; prevMouseX = e.clientX; }
+                else if (gameState === 'PLAYING' && e.button === 0) shoot();
             });
-
             document.addEventListener('mouseup', () => { isDraggingLobby = false; });
-
             document.addEventListener('mousemove', (e) => {
-                if (gameState === 'LOBBY' && isDraggingLobby) {
-                    lobbyAgent.group.rotation.y += (e.clientX - prevMouseX) * 0.01;
-                    prevMouseX = e.clientX;
-                } else if (gameState === 'PLAYING') {
+                if (gameState === 'LOBBY' && isDraggingLobby) { lobbyAgent.group.rotation.y += (e.clientX - prevMouseX) * 0.01; prevMouseX = e.clientX; }
+                else if (gameState === 'PLAYING') {
                     camera.rotation.y -= e.movementX * 0.0022;
-                    camera.rotation.x -= e.movementY * 0.0022;
-                    camera.rotation.x = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, camera.rotation.x));
+                    camera.rotation.x = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, camera.rotation.x - e.movementY * 0.0022));
                 }
             });
-
             document.addEventListener('keydown', (e) => {
-                switch (e.code) {
-                    case 'KeyW': case 'ArrowUp': moveForward = true; break;
-                    case 'KeyS': case 'ArrowDown': moveBackward = true; break;
-                    case 'KeyA': case 'ArrowLeft': moveLeft = true; break;
-                    case 'KeyD': case 'ArrowRight': moveRight = true; break;
-                    case 'Space':
-                        if (player.isGrounded && gameState === 'PLAYING') {
-                            player.velocityY = player.jumpForce;
-                            player.isGrounded = false;
-                        }
-                        break;
-                }
+                if (e.code === 'KeyW' || e.code === 'ArrowUp') moveForward = true;
+                if (e.code === 'KeyS' || e.code === 'ArrowDown') moveBackward = true;
+                if (e.code === 'KeyA' || e.code === 'ArrowLeft') moveLeft = true;
+                if (e.code === 'KeyD' || e.code === 'ArrowRight') moveRight = true;
+                if (e.code === 'Space' && player.isGrounded && gameState === 'PLAYING') { player.velocityY = player.jumpForce; player.isGrounded = false; }
             });
-
             document.addEventListener('keyup', (e) => {
-                switch (e.code) {
-                    case 'KeyW': case 'ArrowUp': moveForward = false; break;
-                    case 'KeyS': case 'ArrowDown': moveBackward = false; break;
-                    case 'KeyA': case 'ArrowLeft': moveLeft = false; break;
-                    case 'KeyD': case 'ArrowRight': moveRight = false; break;
-                }
+                if (e.code === 'KeyW' || e.code === 'ArrowUp') moveForward = false;
+                if (e.code === 'KeyS' || e.code === 'ArrowDown') moveBackward = false;
+                if (e.code === 'KeyA' || e.code === 'ArrowLeft') moveLeft = false;
+                if (e.code === 'KeyD' || e.code === 'ArrowRight') moveRight = false;
             });
-
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-
+            window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
             setInterval(spawnEnemy, 2500);
-
-            // Sincronizar posição online 20 vezes por segundo
             setInterval(() => {
                 if (gameState === 'PLAYING' && Object.keys(connections).length > 0) {
-                    broadcastData({
-                        type: 'sync',
-                        skin: currentSkin,
-                        pos: camera.position,
-                        rotY: camera.rotation.y,
-                        inGame: true
-                    });
+                    broadcastData({ type: 'sync', skin: currentSkin, pos: camera.position, rotY: camera.rotation.y, inGame: true });
                 }
             }, 50);
         }
 
         function checkCollision(pos) {
-            const playerBox = new THREE.Box3(
-                new THREE.Vector3(pos.x - 0.6, pos.y - player.height, pos.z - 0.6),
-                new THREE.Vector3(pos.x + 0.6, pos.y + 0.3, pos.z + 0.6)
-            );
-            for (let box of obstacles) {
-                if (playerBox.intersectsBox(box)) return true;
-            }
-            return false;
+            const box = new THREE.Box3(new THREE.Vector3(pos.x - 0.6, pos.y - player.height, pos.z - 0.6), new THREE.Vector3(pos.x + 0.6, pos.y + 0.3, pos.z + 0.6));
+            return obstacles.some(b => box.intersectsBox(b));
         }
 
-        function takeDamage(amount, sourceName = 'Drone de Apagão') {
+        function takeDamage(amount, source = 'Drone') {
             player.hp = Math.max(0, player.hp - amount);
             document.getElementById('hp').innerText = player.hp + '%';
             const flash = document.getElementById('damage-flash');
-            flash.style.opacity = '1';
-            setTimeout(() => flash.style.opacity = '0', 150);
-
-            if (player.hp <= 0) {
-                addKillFeed(`Você foi eliminado por ${sourceName}`);
-                document.exitPointerLock();
-                setLobbyCamera();
-            }
-        }
-
-        function resetMatchStats() {
-            player.hp = 100;
-            player.score = 0;
-            document.getElementById('hp').innerText = '100%';
-            document.getElementById('score').innerText = '0';
-
-            enemies.forEach(e => scene.remove(e.mesh));
-            enemies.length = 0;
-            bullets.forEach(b => scene.remove(b.mesh));
-            bullets.length = 0;
+            flash.style.opacity = '1'; setTimeout(() => flash.style.opacity = '0', 150);
+            if (player.hp <= 0) { addKillFeed(`Eliminado por ${source}`); document.exitPointerLock(); setLobbyCamera(); }
         }
 
         function animate() {
             requestAnimationFrame(animate);
-
             const time = performance.now();
             const delta = Math.min((time - prevTime) / 1000, 0.1);
             prevTime = time;
 
-            // Animar elementos do cenário (Torre Solar e Rastreadores)
             animatedProps.forEach(p => {
                 if (p.rotX) p.mesh.rotation.x += p.rotX * delta;
                 if (p.rotY) p.mesh.rotation.y += p.rotY * delta;
@@ -1210,126 +698,78 @@
             } else if (gameState === 'PLAYING') {
                 const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), camera.rotation.y);
                 const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), camera.rotation.y);
+                const dir = new THREE.Vector3();
+                if (moveForward) dir.add(forward); if (moveBackward) dir.sub(forward);
+                if (moveRight) dir.add(right); if (moveLeft) dir.sub(right);
+                if (dir.length() > 0) dir.normalize();
 
-                const moveDir = new THREE.Vector3();
-                if (moveForward) moveDir.add(forward);
-                if (moveBackward) moveDir.sub(forward);
-                if (moveRight) moveDir.add(right);
-                if (moveLeft) moveDir.sub(right);
-                if (moveDir.length() > 0) moveDir.normalize();
-
-                const nextX = camera.position.clone().addScaledVector(new THREE.Vector3(moveDir.x, 0, 0), player.speed * delta);
+                const nextX = camera.position.clone().addScaledVector(new THREE.Vector3(dir.x, 0, 0), player.speed * delta);
                 if (!checkCollision(nextX)) camera.position.x = nextX.x;
-
-                const nextZ = camera.position.clone().addScaledVector(new THREE.Vector3(0, 0, moveDir.z), player.speed * delta);
+                const nextZ = camera.position.clone().addScaledVector(new THREE.Vector3(0, 0, dir.z), player.speed * delta);
                 if (!checkCollision(nextZ)) camera.position.z = nextZ.z;
 
                 player.velocityY -= 28 * delta;
                 camera.position.y += player.velocityY * delta;
+                if (camera.position.y <= player.height) { camera.position.y = player.height; player.velocityY = 0; player.isGrounded = true; }
 
-                if (camera.position.y <= player.height) {
-                    camera.position.y = player.height;
-                    player.velocityY = 0;
-                    player.isGrounded = true;
-                }
+                if (gunRecoil > 0) { fpsGunMesh.position.z = -0.65 + gunRecoil; gunRecoil = Math.max(0, gunRecoil - delta * 1.2); }
 
-                if (gunRecoil > 0) {
-                    fpsGunMesh.position.z = -0.65 + gunRecoil;
-                    gunRecoil = Math.max(0, gunRecoil - delta * 1.2);
-                }
-
-                // Suavizar movimento e animação das pernas dos jogadores online
                 Object.values(remotePlayers).forEach(rp => {
                     rp.char.group.position.lerp(rp.targetPos, 0.25);
                     rp.char.group.rotation.y = rp.targetRotY;
-                    if (rp.isMoving) {
-                        rp.char.leftLeg.rotation.x = Math.sin(time * 0.015) * 0.6;
-                        rp.char.rightLeg.rotation.x = -Math.sin(time * 0.015) * 0.6;
-                    } else {
-                        rp.char.leftLeg.rotation.x = 0;
-                        rp.char.rightLeg.rotation.x = 0;
-                    }
+                    rp.char.leftLeg.rotation.x = rp.isMoving ? Math.sin(time * 0.015) * 0.6 : 0;
+                    rp.char.rightLeg.rotation.x = rp.isMoving ? -Math.sin(time * 0.015) * 0.6 : 0;
                 });
 
-                // Atualizar Tiros
                 for (let i = bullets.length - 1; i >= 0; i--) {
                     const b = bullets[i];
                     b.mesh.position.addScaledVector(b.velocity, delta);
                     b.life -= delta;
-
                     let hit = false;
 
-                    // 1. Acertar Drones
                     for (let j = enemies.length - 1; j >= 0; j--) {
-                        const e = enemies[j];
-                        if (b.mesh.position.distanceTo(e.mesh.position) < 1.5) {
-                            e.hp--;
-                            hit = true;
-                            if (e.hp <= 0) {
-                                scene.remove(e.mesh);
-                                enemies.splice(j, 1);
+                        if (b.mesh.position.distanceTo(enemies[j].mesh.position) < 1.5) {
+                            enemies[j].hp--; hit = true;
+                            if (enemies[j].hp <= 0) {
+                                scene.remove(enemies[j].mesh); enemies.splice(j, 1);
                                 if (b.ownerId === 'LOCAL') {
-                                    registerKill('Drone de Apagão');
+                                    player.score++; player.credits += 50;
+                                    document.getElementById('score').innerText = player.score;
+                                    document.getElementById('lobby-credits').innerText = player.credits;
+                                    addKillFeed('⚡ Drone destruído (+50 kWh)');
+                                    if (player.score > player.bestScore) { player.bestScore = player.score; document.getElementById('best-score').innerText = player.bestScore; }
                                 }
                             }
                             break;
                         }
                     }
 
-                    // 2. Acertar Jogadores Online (PvP)
                     if (!hit && b.ownerId === 'LOCAL') {
                         for (const [peerId, rp] of Object.entries(remotePlayers)) {
-                            if (!rp.char.group.visible) continue;
-                            const center = rp.char.group.position.clone().add(new THREE.Vector3(0, 1.4, 0));
-                            if (b.mesh.position.distanceTo(center) < 1.1) {
-                                hit = true;
-                                broadcastData({ type: 'hit', target: peerId });
-                                addKillFeed(`Acertou plasma em ${peerId}!`);
-                                break;
+                            if (rp.char.group.visible && b.mesh.position.distanceTo(rp.char.group.position.clone().add(new THREE.Vector3(0, 1.4, 0))) < 1.1) {
+                                hit = true; broadcastData({ type: 'hit', target: peerId }); addKillFeed(`Acertou plasma em ${peerId}!`); break;
                             }
                         }
                     }
 
-                    if (hit || b.life <= 0) {
-                        scene.remove(b.mesh);
-                        bullets.splice(i, 1);
-                    }
+                    if (hit || b.life <= 0) { scene.remove(b.mesh); bullets.splice(i, 1); }
                 }
 
-                // Atualizar Drones Inimigos
                 for (let i = enemies.length - 1; i >= 0; i--) {
                     const e = enemies[i];
                     e.mesh.lookAt(camera.position.x, e.mesh.position.y, camera.position.z);
                     e.mesh.position.y = 2.0 + Math.sin(time * 0.005 + i) * 0.3;
-
-                    const toPlayer = new THREE.Vector3().subVectors(camera.position, e.mesh.position);
-                    toPlayer.y = 0;
-                    if (toPlayer.length() > 2.2) {
-                        toPlayer.normalize();
-                        e.mesh.position.addScaledVector(toPlayer, e.speed * delta);
-                    } else {
-                        takeDamage(15, 'Drone de Apagão');
-                        scene.remove(e.mesh);
-                        enemies.splice(i, 1);
-                    }
+                    const toPlayer = new THREE.Vector3().subVectors(camera.position, e.mesh.position); toPlayer.y = 0;
+                    if (toPlayer.length() > 2.2) e.mesh.position.addScaledVector(toPlayer.normalize(), e.speed * delta);
+                    else { takeDamage(15); scene.remove(e.mesh); enemies.splice(i, 1); }
                 }
             }
-
             renderer.render(scene, camera);
         }
 
-        function registerKill(victim) {
-            player.score++;
-            player.credits += 50;
-            document.getElementById('score').innerText = player.score;
-            document.getElementById('lobby-credits').innerText = player.credits;
-            addKillFeed(`⚡ Você destruiu ${victim} (+50 kWh)`);
-
-            if (player.score > player.bestScore) {
-                player.bestScore = player.score;
-                document.getElementById('best-score').innerText = player.bestScore;
-            }
-        }
+        init();
+        initMultiplayer();
+        animate();
     </script>
 </body>
 </html>
