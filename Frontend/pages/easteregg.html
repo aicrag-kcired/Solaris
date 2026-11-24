@@ -183,8 +183,9 @@
             WASD: Mover | ESPAÇO: Pular | SUBA NAS RAMPAS DAS TORRES E ENTRE NOS GALPÕES | CLIQUE: Atirar
         </div>
     </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
     <script>
         let scene, camera, renderer;
@@ -193,14 +194,13 @@
 
         const player = { height: 2.3, speed: 16, jumpForce: 12.5, velocityY: 0, isGrounded: true, hp: 100, score: 0, bestScore: 0, credits: 1250 };
         let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
-        
-        // obstacles = paredes sólidas | walkableSurfaces = pisos elevados e rampas onde o jogador pisa
+
         const obstacles = [], walkableSurfaces = [], bullets = [], enemies = [], animatedProps = [];
 
         let lobbyAgent, fpsGunMesh, fpsGunCore, fpsGunBarrel;
         let gunRecoil = 0, isDraggingLobby = false, prevMouseX = 0;
 
-        let peer = null, myPeerId = '';
+        let mqttClient = null, myPeerId = '', currentRoomTopic = '';
         const connections = {}, remotePlayers = {};
 
         const skins = {
@@ -244,7 +244,6 @@
             setLobbyCamera();
         }
 
-        // Helper para criar plataformas e rampas onde o jogador consegue andar por cima
         function addWalkableBox(x, y, z, w, h, d, mat) {
             const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
             mesh.position.set(x, y, z);
@@ -269,7 +268,6 @@
             else mesh.rotation.z = dir > 0 ? angle : -angle;
             scene.add(mesh);
 
-            // Balizadores laterais luminosos na rampa para facilitar visualização
             const stripMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b });
             const stripGeom = axis === 'z' ? new THREE.BoxGeometry(0.15, 0.2, hyp) : new THREE.BoxGeometry(hyp, 0.2, 0.15);
             [-w / 2 + 0.1, w / 2 - 0.1].forEach(offset => {
@@ -312,7 +310,6 @@
             const grid = new THREE.GridHelper(220, 55, 0xf59e0b, 0x223047);
             grid.position.y = 0.02; scene.add(grid);
 
-            // Muros Perimetrais
             const wallMat = new THREE.MeshStandardMaterial({ color: 0x0f172a });
             const trimMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b });
             [{ x: 0, z: -110, w: 220, d: 2 }, { x: 0, z: 110, w: 220, d: 2 }, { x: -110, z: 0, w: 2, d: 220 }, { x: 110, z: 0, w: 2, d: 220 }].forEach(p => {
@@ -327,16 +324,13 @@
             const roofMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.7 });
             const railMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
 
-            // ==========================================================
             // 1. TORRE CENTRAL HELIOTÉRMICA COM DECK SUBÍVEL
-            // ==========================================================
             const towerBase = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 4.2, 26, 16), new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8 }));
             towerBase.position.set(0, 13, -36); scene.add(towerBase);
             obstacles.push(new THREE.Box3(new THREE.Vector3(-3.2, 0, -39.2), new THREE.Vector3(3.2, 26, -32.8)));
 
-            // Plataforma circular/quadrada em volta da Torre Central (altura 4.5m) + Rampa de subida!
             addWalkableBox(0, 4.25, -36, 18, 0.5, 18, deckMat);
-            addRamp(0, -19.5, 4.5, 15, 0, 4.5, 'z', -1, rampMat); // Sobe indo para o Norte (-Z)
+            addRamp(0, -19.5, 4.5, 15, 0, 4.5, 'z', -1, rampMat);
 
             const receiver = new THREE.Mesh(new THREE.CylinderGeometry(3.8, 3.8, 4.8, 20), new THREE.MeshBasicMaterial({ color: 0xfbbf24 }));
             receiver.position.set(0, 28, -36); scene.add(receiver);
@@ -345,9 +339,7 @@
             ring1.position.set(0, 28, -36); scene.add(ring1);
             animatedProps.push({ mesh: ring1, rotX: 0.7, rotY: 1.1 });
 
-            // ==========================================================
             // 2. 4 TORRES DE VIGIA ESCALÁVEIS COM RAMPAS E PARAPEITOS
-            // ==========================================================
             const watchTowers = [
                 { x: -65, z: -65, rampDirZ: 1 },
                 { x: 65, z: -65, rampDirZ: 1 },
@@ -357,31 +349,24 @@
 
             watchTowers.forEach(t => {
                 const topH = 6.5;
-                // Pilares de sustentação
                 [[-5, -5], [5, -5], [-5, 5], [5, 5]].forEach(([px, pz]) => {
                     const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.8, topH, 0.8), deckMat);
                     pillar.position.set(t.x + px, topH / 2, t.z + pz); scene.add(pillar);
                 });
-                // Piso do topo da torre (12x12m)
                 addWalkableBox(t.x, topH - 0.25, t.z, 12, 0.5, 12, deckMat);
 
-                // Parapeitos de proteção no topo (deixando abertura para a rampa)
                 addSolidWall(t.x - 5.8, topH + 0.6, t.z, 0.4, 1.2, 12, houseWallMat);
                 addSolidWall(t.x + 5.8, topH + 0.6, t.z, 0.4, 1.2, 12, houseWallMat);
                 addSolidWall(t.x, topH + 0.6, t.z - (5.8 * t.rampDirZ), 12, 1.2, 0.4, houseWallMat);
 
-                // Luz neon no topo da torre
                 const beacon = new THREE.Mesh(new THREE.BoxGeometry(12.2, 0.2, 12.2), railMat);
                 beacon.position.set(t.x, topH - 0.1, t.z); scene.add(beacon);
 
-                // Rampa longa para subir até o topo
                 const rampZ = t.z + (15 * t.rampDirZ);
                 addRamp(t.x, rampZ, 4.0, 18, 0, topH, 'z', -t.rampDirZ, rampMat);
             });
 
-            // ==========================================================
             // 3. 2 CASAS / GALPÕES TÁTICOS ENTRÁVEIS (COM TELHADO SUBÍVEL)
-            // ==========================================================
             const houses = [
                 { x: -42, z: 0 },
                 { x: 42, z: 0 }
@@ -389,44 +374,35 @@
 
             houses.forEach(h => {
                 const w = 16, d = 20, wallH = 5.5;
-                // Piso interno elevado levemente
                 addWalkableBox(h.x, 0.1, h.z, w, 0.2, d, deckMat);
 
-                // Paredes Leste e Oeste com janelas abertas no meio (você pode atirar pelas janelas!)
                 [-w / 2 + 0.3, w / 2 - 0.3].forEach(wx => {
-                    addSolidWall(h.x + wx, wallH / 2, h.z - 6, 0.6, wallH, 8, houseWallMat); // Parede Norte
-                    addSolidWall(h.x + wx, wallH / 2, h.z + 6, 0.6, wallH, 8, houseWallMat); // Parede Sul
-                    addSolidWall(h.x + wx, 0.9, h.z, 0.6, 1.8, 4, houseWallMat); // Peitoril da janela
-                    addSolidWall(h.x + wx, 4.6, h.z, 0.6, 1.8, 4, houseWallMat); // Verga da janela
+                    addSolidWall(h.x + wx, wallH / 2, h.z - 6, 0.6, wallH, 8, houseWallMat);
+                    addSolidWall(h.x + wx, wallH / 2, h.z + 6, 0.6, wallH, 8, houseWallMat);
+                    addSolidWall(h.x + wx, 0.9, h.z, 0.6, 1.8, 4, houseWallMat);
+                    addSolidWall(h.x + wx, 4.6, h.z, 0.6, 1.8, 4, houseWallMat);
                 });
 
-                // Paredes Norte e Sul com portas largas de 5m no centro para você entrar
                 [-d / 2 + 0.3, d / 2 - 0.3].forEach(wz => {
                     addSolidWall(h.x - 5.25, wallH / 2, h.z + wz, 5.5, wallH, 0.6, houseWallMat);
                     addSolidWall(h.x + 5.25, wallH / 2, h.z + wz, 5.5, wallH, 0.6, houseWallMat);
-                    addSolidWall(h.x, 4.6, h.z + wz, 5.0, 1.8, 0.6, houseWallMat); // Cima da porta
+                    addSolidWall(h.x, 4.6, h.z + wz, 5.0, 1.8, 0.6, houseWallMat);
                 });
 
-                // Laje do Telhado (você pode subir no telhado da casa pela rampa lateral!)
                 addWalkableBox(h.x, wallH + 0.25, h.z, w + 1, 0.5, d + 1, roofMat);
                 const roofTrim = new THREE.Mesh(new THREE.BoxGeometry(w + 1.2, 0.2, d + 1.2), trimMat);
                 roofTrim.position.set(h.x, wallH + 0.3, h.z); scene.add(roofTrim);
 
-                // Rampa lateral externa para subir no telhado da casa
                 const sideDir = h.x < 0 ? -1 : 1;
                 addRamp(h.x + (10.5 * sideDir), h.z, 3.5, 14, 0, wallH + 0.5, 'x', -sideDir, rampMat);
             });
 
-            // ==========================================================
             // 4. PONTE AÉREA LIGANDO AS TORRES NORTE
-            // ==========================================================
             addWalkableBox(0, 6.25, -65, 118, 0.5, 4.5, deckMat);
             const bridgeNeon = new THREE.Mesh(new THREE.BoxGeometry(118, 0.15, 4.7), railMat);
             bridgeNeon.position.set(0, 6.2, -65); scene.add(bridgeNeon);
 
-            // ==========================================================
             // 5. RASTREADORES SOLARES & BUNKERS DE COBERTURA NO PÁTIO
-            // ==========================================================
             const canvas = document.createElement('canvas');
             canvas.width = 128; canvas.height = 128;
             const ctx = canvas.getContext('2d');
@@ -451,7 +427,6 @@
                 obstacles.push(new THREE.Box3(new THREE.Vector3(x - 4.1, 0, z - 2.6), new THREE.Vector3(x + 4.1, 3.8, z + 2.6)));
             });
 
-            // Caixas de cobertura tática
             [[-12, 10], [12, 10], [0, 28], [-15, -48], [15, -48]].forEach(([bx, bz]) => {
                 addSolidWall(bx, 0.9, bz, 3.2, 1.8, 2.2, houseWallMat);
                 const strip = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.18, 2.3), trimMat);
@@ -522,89 +497,83 @@
             camera.add(fpsGunMesh);
             scene.add(camera);
         }
+
         function initMultiplayer() {
             const randomNum = Math.floor(1000 + Math.random() * 9000);
             myPeerId = 'SOLARIS-' + randomNum;
+            currentRoomTopic = 'solaris-overdrive-arena/sala/' + myPeerId;
 
-            peer = new Peer(myPeerId, {
-                host: '0.peerjs.com',
-                port: 443,
-                path: '/',
-                secure: true,
-                config: {
-                    iceServers: [
-                        { urls: 'stun:stun.l.google.com:19302' },
-                        { urls: 'stun:stun1.l.google.com:19302' },
-                        { urls: 'stun:global.stun.twilio.com:3478' }
-                    ]
-                }
+            document.getElementById('my-room-code').innerText = myPeerId;
+            document.getElementById('online-badge').innerText = '● CONECTANDO WSS...';
+            document.getElementById('online-badge').style.color = '#f59e0b';
+
+            mqttClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt', {
+                clientId: myPeerId + '-' + Math.floor(Math.random() * 1000),
+                clean: true,
+                reconnectPeriod: 3000
             });
 
-            peer.on('open', (id) => {
-                document.getElementById('my-room-code').innerText = id;
-                document.getElementById('online-badge').innerText = '● P2P PRONTO';
+            mqttClient.on('connect', () => {
+                document.getElementById('online-badge').innerText = '● ONLINE (WSS)';
                 document.getElementById('online-badge').style.color = '#22c55e';
-                document.getElementById('mp-status').innerText = 'Aguardando jogadores (1/4)...';
+                document.getElementById('mp-status').innerText = 'Sala pronta! Passe o código para seu amigo.';
+                mqttClient.subscribe(currentRoomTopic);
+                broadcastData({ type: 'join', skin: currentSkin });
             });
 
-            peer.on('connection', (conn) => {
-                document.getElementById('mp-status').innerText = 'Recebendo jogador...';
-                setupConnection(conn);
+            mqttClient.on('message', (topic, message) => {
+                try {
+                    const data = JSON.parse(message.toString());
+                    if (!data.sender || data.sender === myPeerId) return;
+
+                    if (!connections[data.sender]) {
+                        connections[data.sender] = { lastSeen: Date.now() };
+                        updateOnlineUI();
+                        broadcastData({ type: 'sync', skin: currentSkin, pos: camera.position, rotY: camera.rotation.y, inGame: gameState === 'PLAYING' });
+                    }
+                    connections[data.sender].lastSeen = Date.now();
+                    handleNetworkData(data.sender, data);
+                } catch (e) {}
             });
 
-            peer.on('disconnected', () => {
-                document.getElementById('online-badge').innerText = '● RECONECTANDO...';
-                document.getElementById('online-badge').style.color = '#f59e0b';
-                setTimeout(() => { if (peer && !peer.destroyed) peer.reconnect(); }, 3000);
+            mqttClient.on('error', () => {
+                document.getElementById('online-badge').innerText = '● BLOQUEADO';
+                document.getElementById('online-badge').style.color = '#ef4444';
+                document.getElementById('mp-status').innerText = '❌ Rede escolar bloqueou WebSocket externo.';
             });
 
-            peer.on('error', (err) => {
-                if (err.type === 'peer-unavailable') {
-                    document.getElementById('mp-status').innerText = '❌ Sala não encontrada! Confira o código.';
-                } else {
-                    document.getElementById('mp-status').innerText = '⚠️ Rede restrita para P2P (' + err.type + ')';
+            setInterval(() => {
+                const now = Date.now();
+                let changed = false;
+                for (const id of Object.keys(connections)) {
+                    if (now - connections[id].lastSeen > 5000) {
+                        delete connections[id];
+                        if (remotePlayers[id]) {
+                            scene.remove(remotePlayers[id].char.group);
+                            delete remotePlayers[id];
+                        }
+                        changed = true;
+                    }
                 }
-            });
+                if (changed) updateOnlineUI();
+            }, 2000);
         }
 
         function connectToFriend() {
             const friendCode = document.getElementById('join-code-input').value.trim().toUpperCase();
-            if (!friendCode || friendCode === myPeerId) return;
+            if (!friendCode || friendCode === myPeerId || !mqttClient || !mqttClient.connected) return;
 
-            document.getElementById('mp-status').innerText = 'Conectando a ' + friendCode + '...';
-            const conn = peer.connect(friendCode, { reliable: true });
-
-            const timeout = setTimeout(() => {
-                if (!conn.open) {
-                    document.getElementById('mp-status').innerText = '❌ Tempo esgotado. Verifique o código ou rede.';
-                }
-            }, 8000);
-
-            conn.on('open', () => clearTimeout(timeout));
-            setupConnection(conn);
-        }
-
-        function setupConnection(conn) {
-            conn.on('open', () => {
-                connections[conn.peer] = conn;
-                updateOnlineUI();
-                conn.send({ type: 'sync', skin: currentSkin, pos: camera.position, rotY: camera.rotation.y, inGame: gameState === 'PLAYING' });
-            });
-
-            conn.on('data', (data) => handleNetworkData(conn.peer, data));
-
-            conn.on('close', () => {
-                delete connections[conn.peer];
-                if (remotePlayers[conn.peer]) {
-                    scene.remove(remotePlayers[conn.peer].char.group);
-                    delete remotePlayers[conn.peer];
-                }
-                updateOnlineUI();
+            mqttClient.unsubscribe(currentRoomTopic);
+            currentRoomTopic = 'solaris-overdrive-arena/sala/' + friendCode;
+            mqttClient.subscribe(currentRoomTopic, () => {
+                document.getElementById('mp-status').innerText = 'Entrando na sala ' + friendCode + '...';
+                broadcastData({ type: 'join', skin: currentSkin });
+                broadcastData({ type: 'sync', skin: currentSkin, pos: camera.position, rotY: camera.rotation.y, inGame: gameState === 'PLAYING' });
             });
         }
 
         function handleNetworkData(peerId, data) {
-            if (data.type === 'sync') {
+            if (data.type === 'join' || data.type === 'sync') {
                 if (!remotePlayers[peerId]) {
                     const char = createDetailedCharacterMesh(data.skin || 'solar');
                     char.pedestal.visible = false;
@@ -612,13 +581,13 @@
                     remotePlayers[peerId] = { char, targetPos: new THREE.Vector3(), targetRotY: 0, isMoving: false };
                 }
                 const rp = remotePlayers[peerId];
-                rp.char.group.visible = data.inGame;
+                rp.char.group.visible = !!data.inGame;
                 if (data.pos) {
                     const newPos = new THREE.Vector3(data.pos.x, data.pos.y - player.height, data.pos.z);
                     rp.isMoving = rp.targetPos.distanceTo(newPos) > 0.05;
                     rp.targetPos.copy(newPos);
                 }
-                rp.targetRotY = data.rotY + Math.PI;
+                if (typeof data.rotY === 'number') rp.targetRotY = data.rotY + Math.PI;
             } else if (data.type === 'shoot') {
                 spawnBullet(new THREE.Vector3(data.origin.x, data.origin.y, data.origin.z), new THREE.Vector3(data.dir.x, data.dir.y, data.dir.z), data.color || 0x38bdf8, peerId);
             } else if (data.type === 'hit' && data.target === myPeerId) {
@@ -627,7 +596,10 @@
         }
 
         function broadcastData(payload) {
-            Object.values(connections).forEach(conn => { if (conn.open) conn.send(payload); });
+            if (mqttClient && mqttClient.connected && currentRoomTopic) {
+                payload.sender = myPeerId;
+                mqttClient.publish(currentRoomTopic, JSON.stringify(payload));
+            }
         }
 
         function updateOnlineUI() {
@@ -770,29 +742,25 @@
             window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
             setInterval(spawnEnemy, 2500);
             setInterval(() => {
-                if (gameState === 'PLAYING' && Object.keys(connections).length > 0) {
-                    broadcastData({ type: 'sync', skin: currentSkin, pos: camera.position, rotY: camera.rotation.y, inGame: true });
+                if (mqttClient && mqttClient.connected) {
+                    broadcastData({ type: 'sync', skin: currentSkin, pos: camera.position, rotY: camera.rotation.y, inGame: gameState === 'PLAYING' });
                 }
-            }, 50);
+            }, 80);
         }
 
-        // Calcula o piso mais alto sob os pés do jogador (chão, rampa, torre ou telhado da casa)
         function getGroundHeight(x, z, currentFeetY) {
             let maxGround = 0;
             for (const surf of walkableSurfaces) {
                 if (x >= surf.minX - 0.3 && x <= surf.maxX + 0.3 && z >= surf.minZ - 0.3 && z <= surf.maxZ + 0.3) {
                     const h = surf.getHeight(x, z);
-                    // Só pisa na superfície se ela estiver abaixo ou no máximo 0.85m acima dos pés (para subir degraus/rampas)
-                    if (h <= currentFeetY + 0.85 && h > maxGround) {
-                        maxGround = h;
-                    }
+                    if (h <= currentFeetY + 0.85 && h > maxGround) maxGround = h;
                 }
             }
             return maxGround;
         }
 
         function checkCollision(pos) {
-            const feetY = pos.y - player.height + 0.4; // Tolerância nos pés para subir rampas
+            const feetY = pos.y - player.height + 0.4;
             const headY = pos.y + 0.2;
             const box = new THREE.Box3(
                 new THREE.Vector3(pos.x - 0.55, feetY, pos.z - 0.55),
@@ -836,7 +804,6 @@
                 const nextZ = camera.position.clone().addScaledVector(new THREE.Vector3(0, 0, dir.z), player.speed * delta);
                 if (!checkCollision(nextZ)) camera.position.z = nextZ.z;
 
-                // Física vertical com suporte a rampas, torres, pontes e telhados
                 const currentFeetY = camera.position.y - player.height;
                 const groundY = getGroundHeight(camera.position.x, camera.position.z, currentFeetY);
                 const targetEyeY = groundY + player.height;
@@ -867,10 +834,7 @@
                     b.life -= delta;
                     let hit = false;
 
-                    // Colisão da bala com paredes e casas
-                    if (obstacles.some(box => box.containsPoint(b.mesh.position))) {
-                        hit = true;
-                    }
+                    if (obstacles.some(box => box.containsPoint(b.mesh.position))) hit = true;
 
                     if (!hit) {
                         for (let j = enemies.length - 1; j >= 0; j--) {
@@ -905,7 +869,6 @@
                 for (let i = enemies.length - 1; i >= 0; i--) {
                     const e = enemies[i];
                     e.mesh.lookAt(camera.position.x, e.mesh.position.y, camera.position.z);
-                    // Drones voam acompanhando suavemente a altura do jogador (atacam até nas torres!)
                     const targetDroneY = Math.max(2.0, camera.position.y - 0.3 + Math.sin(time * 0.005 + i) * 0.3);
                     e.mesh.position.y += (targetDroneY - e.mesh.position.y) * 2 * delta;
 
