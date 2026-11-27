@@ -1,9 +1,12 @@
-
 from fastapi import APIRouter, HTTPException, Response, status
+from passlib.context import CryptContext
 from database import supabase
-from models.clientes import ClienteEntrada, ClienteSaida
+from models.clientes import ClienteEntrada, ClienteSaida, ClienteLogin
 
 router = APIRouter(prefix="/clientes", tags=["Clientes"])
+
+# Configuração do criptografador de senhas
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 # POST: cadastrar cliente
@@ -14,6 +17,9 @@ router = APIRouter(prefix="/clientes", tags=["Clientes"])
 )
 def cadastrar_cliente(dados: ClienteEntrada):
     conteudo = dados.model_dump(mode="json")
+
+    # Criptografa a senha antes de salvar no banco
+    conteudo["senha"] = pwd_context.hash(conteudo["senha"])
 
     resposta = (
         supabase.table("clientes")
@@ -28,6 +34,38 @@ def cadastrar_cliente(dados: ClienteEntrada):
         )
 
     return resposta.data[0]
+
+
+# POST: login do cliente
+@router.post("/login")
+def login_cliente(dados: ClienteLogin):
+    # Busca o cliente pelo e-mail
+    resposta = (
+        supabase.table("clientes")
+        .select("*")
+        .eq("email_cliente", dados.email_cliente)
+        .execute()
+    )
+
+    if not resposta.data:
+        raise HTTPException(
+            status_code=401,
+            detail="E-mail ou senha inválidos."
+        )
+
+    cliente = resposta.data[0]
+
+    # Verifica se a senha digitada bate com a criptografada no banco
+    if not pwd_context.verify(dados.senha, cliente["senha"]):
+        raise HTTPException(
+            status_code=401,
+            detail="E-mail ou senha inválidos."
+        )
+
+    # Remove a senha da resposta por segurança
+    cliente.pop("senha", None)
+    
+    return cliente
 
 
 # GET: listar clientes
@@ -66,6 +104,9 @@ def consultar_cliente(id_cliente: int):
 @router.put("/{id_cliente}", response_model=ClienteSaida)
 def atualizar_cliente(id_cliente: int, dados: ClienteEntrada):
     conteudo = dados.model_dump(mode="json")
+
+    # Criptografa a nova senha ao atualizar
+    conteudo["senha"] = pwd_context.hash(conteudo["senha"])
 
     resposta = (
         supabase.table("clientes")

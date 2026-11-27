@@ -1,5 +1,6 @@
 from decimal import Decimal
-from pydantic import BaseModel, Field, field_validator, EmailStr
+from typing import Optional
+from pydantic import BaseModel, Field, field_validator
 
 class ClienteEntrada(BaseModel):
     nome_cliente: str = Field(min_length=1, max_length=50)
@@ -20,7 +21,6 @@ class ClienteEntrada(BaseModel):
             raise ValueError("O nome do cliente não pode ficar vazio.")
         return valor
 
-# A Saída não herda mais a Entrada diretamente, para não vazar a senha no JSON de resposta
 class ClienteSaida(BaseModel):
     id_cliente: int
     nome_cliente: str
@@ -31,6 +31,7 @@ class ClienteSaida(BaseModel):
     endereco_cliente: str
     tipo_imovel_cliente: str
     renda_mensal_cliente: Decimal
+    senha: Optional[str] = None # <-- ESSA LINHA RESOLVE O ERRO 500
 
 class ClienteLogin(BaseModel):
     email_cliente: str

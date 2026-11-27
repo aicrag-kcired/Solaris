@@ -11,7 +11,6 @@
 
   <!-- Scripts localizados em Frontend/js -->
   <script src="../js/menu.js" defer></script>
-  <script src="../js/inicio.js" defer></script>
   <script src="../js/acessibilidade.js" defer></script>
 </head>
 
@@ -41,22 +40,10 @@
             <ellipse cx="50" cy="85" rx="8" ry="14"/>
             <ellipse cx="15" cy="50" rx="14" ry="8"/>
             <ellipse cx="85" cy="50" rx="14" ry="8"/>
-            <ellipse
-              cx="25" cy="25" rx="8" ry="14"
-              transform="rotate(-45 25 25)"
-            />
-            <ellipse
-              cx="75" cy="25" rx="8" ry="14"
-              transform="rotate(45 75 25)"
-            />
-            <ellipse
-              cx="25" cy="75" rx="8" ry="14"
-              transform="rotate(45 25 75)"
-            />
-            <ellipse
-              cx="75" cy="75" rx="8" ry="14"
-              transform="rotate(-45 75 75)"
-            />
+            <ellipse cx="25" cy="25" rx="8" ry="14" transform="rotate(-45 25 25)"/>
+            <ellipse cx="75" cy="25" rx="8" ry="14" transform="rotate(45 75 25)"/>
+            <ellipse cx="25" cy="75" rx="8" ry="14" transform="rotate(45 25 75)"/>
+            <ellipse cx="75" cy="75" rx="8" ry="14" transform="rotate(-45 75 75)"/>
           </g>
           <circle cx="50" cy="50" r="20" fill="#3d2a22"/>
         </svg>laris
@@ -75,56 +62,22 @@
           ⚙️
         </button>
 
-        <div
-          id="menu-acessibilidade"
-          class="menu-acessibilidade"
-          hidden
-        >
+        <div id="menu-acessibilidade" class="menu-acessibilidade" hidden>
           <h4>Acessibilidade</h4>
-
-          <button id="btn-tema" class="opcao-acess" type="button">
-            🌓 Modo Escuro
-          </button>
-
+          <button id="btn-tema" class="opcao-acess" type="button">🌓 Modo Escuro</button>
           <div class="controle-fonte">
             <span>Tamanho da letra:</span>
-
             <div class="botoes-fonte">
-              <button
-                type="button"
-                data-set-texto="normal"
-                aria-pressed="true"
-              >
-                Normal
-              </button>
-
-              <button
-                type="button"
-                data-set-texto="grande"
-                aria-pressed="false"
-              >
-                A+
-              </button>
-
-              <button
-                type="button"
-                data-set-texto="maior"
-                aria-pressed="false"
-              >
-                A++
-              </button>
+              <button type="button" data-set-texto="normal" aria-pressed="true">Normal</button>
+              <button type="button" data-set-texto="grande" aria-pressed="false">A+</button>
+              <button type="button" data-set-texto="maior" aria-pressed="false">A++</button>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <nav
-      id="menu-lateral"
-      class="menu-lateral"
-      aria-label="Navegação principal"
-      hidden
-    >
+    <nav id="menu-lateral" class="menu-lateral" aria-label="Navegação principal" hidden>
       <a href="inicio.html" aria-current="page">Início</a>
       <a href="sobre.html">Sobre</a>
       <a href="ia.html">IA Solaris</a>
@@ -144,19 +97,11 @@
       <h1>Cadastro e <span>Log-in</span></h1>
     </div>
 
-    <p
-      id="mensagem"
-      class="mensagem"
-      role="status"
-      aria-live="polite"
-      hidden
-    ></p>
+    <!-- Mensagem de feedback (Sucesso / Erro) -->
+    <p id="mensagem" class="mensagem" role="status" aria-live="polite" hidden></p>
 
     <div class="acesso">
-      <a
-        class="botao botao-principal botao-link"
-        href="clientes.html"
-      >
+      <a class="botao botao-principal botao-link" href="clientes.html">
         Abrir gestão de clientes (CRUD)
       </a>
 
@@ -172,11 +117,8 @@
     </div>
 
     <div id="area-acesso" hidden>
-      <section
-        id="painel-login"
-        class="painel"
-        aria-labelledby="titulo-login"
-      >
+      <!-- PAINEL DE LOGIN -->
+      <section id="painel-login" class="painel" aria-labelledby="titulo-login">
         <div class="painel-titulo">
           <h2 id="titulo-login">Entrar</h2>
           <span class="legenda">JÁ TENHO CONTA</span>
@@ -186,55 +128,29 @@
           <div class="campos campos-cliente">
             <div class="campo campo-largo">
               <label for="login-email">E-mail</label>
-              <input
-                id="login-email"
-                type="email"
-                maxlength="100"
-                placeholder="voce@exemplo.com"
-                required
-              >
+              <input id="login-email" type="email" maxlength="100" placeholder="voce@exemplo.com" required>
             </div>
 
             <div class="campo campo-largo">
               <label for="login-senha">Senha</label>
-              <input
-                id="login-senha"
-                type="password"
-                minlength="6"
-                placeholder="Mínimo 6 caracteres"
-                required
-              >
+              <input id="login-senha" type="password" minlength="6" placeholder="Mínimo 6 caracteres" required>
             </div>
           </div>
 
           <div class="acoes">
-            <button
-              id="botao-entrar"
-              class="botao botao-principal"
-              type="submit"
-            >
-              Entrar
-            </button>
+            <button id="botao-entrar" class="botao botao-principal" type="submit">Entrar</button>
           </div>
         </form>
 
         <div class="acesso-troca">
-          <button
-            id="botao-ir-cadastro"
-            class="link-botao"
-            type="button"
-          >
+          <button id="botao-ir-cadastro" class="link-botao" type="button">
             Sem conta? Cadastre-se
           </button>
         </div>
       </section>
 
-      <section
-        id="painel-cadastro"
-        class="painel"
-        aria-labelledby="titulo-cadastro"
-        hidden
-      >
+      <!-- PAINEL DE CADASTRO -->
+      <section id="painel-cadastro" class="painel" aria-labelledby="titulo-cadastro" hidden>
         <div class="painel-titulo">
           <h2 id="titulo-cadastro">Novo cliente</h2>
           <span class="legenda">DADOS DO CLIENTE</span>
@@ -244,80 +160,43 @@
           <div class="campos campos-cliente">
             <div class="campo campo-largo">
               <label for="nome-cliente">Nome do cliente</label>
-              <input
-                id="nome-cliente"
-                type="text"
-                maxlength="50"
-                placeholder="Digite o nome completo"
-                required
-              >
+              <input id="nome-cliente" type="text" maxlength="50" placeholder="Digite o nome completo" required>
             </div>
 
             <div class="campo">
               <label for="cpf-cliente">CPF</label>
-              <input
-                id="cpf-cliente"
-                type="text"
-                maxlength="14"
-                placeholder="000.000.000-00"
-                required
-              >
+              <input id="cpf-cliente" type="text" maxlength="14" placeholder="000.000.000-00" required>
             </div>
 
             <div class="campo">
               <label for="rg-cliente">RG</label>
-              <input
-                id="rg-cliente"
-                type="text"
-                maxlength="20"
-                required
-              >
+              <input id="rg-cliente" type="text" maxlength="20" required>
             </div>
 
             <div class="campo">
               <label for="numero-cliente">Telefone</label>
-              <input
-                id="numero-cliente"
-                type="tel"
-                maxlength="15"
-                placeholder="(41) 90000-0000"
-                required
-              >
+              <input id="numero-cliente" type="tel" maxlength="15" placeholder="(41) 90000-0000" required>
             </div>
 
             <div class="campo">
               <label for="email-cliente">E-mail</label>
-              <input
-                id="email-cliente"
-                type="email"
-                maxlength="100"
-                placeholder="voce@exemplo.com"
-                required
-              >
+              <input id="email-cliente" type="email" maxlength="100" placeholder="voce@exemplo.com" required>
+            </div>
+
+            <!-- CAMPO SENHA ADICIONADO (Necessário para o Banco de Dados) -->
+            <div class="campo campo-largo">
+              <label for="senha-cliente">Senha</label>
+              <input id="senha-cliente" type="password" minlength="6" placeholder="Crie uma senha" required>
             </div>
 
             <div class="campo campo-largo">
               <label for="endereco-cliente">Endereço</label>
-              <input
-                id="endereco-cliente"
-                type="text"
-                maxlength="150"
-                placeholder="Rua, número, bairro, cidade"
-                required
-              >
+              <input id="endereco-cliente" type="text" maxlength="150" placeholder="Rua, número, bairro, cidade" required>
             </div>
 
             <div class="campo">
               <label for="tipo-imovel-cliente">Tipo de imóvel</label>
-              <input
-                id="tipo-imovel-cliente"
-                type="text"
-                maxlength="30"
-                list="tipos-imovel"
-                placeholder="Ex.: Casa"
-                required
-              >
-
+              <input id="tipo-imovel-cliente" type="text" maxlength="30" list="tipos-imovel" placeholder="Ex.: Casa" required>
               <datalist id="tipos-imovel">
                 <option value="Casa"></option>
                 <option value="Apartamento"></option>
@@ -328,44 +207,18 @@
 
             <div class="campo">
               <label for="renda-cliente">Renda mensal (R$)</label>
-              <input
-                id="renda-cliente"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="0,00"
-                required
-              >
+              <input id="renda-cliente" type="number" min="0" step="0.01" placeholder="0,00" required>
             </div>
           </div>
 
           <div class="acoes">
-            <button
-              id="botao-salvar"
-              class="botao botao-principal"
-              type="submit"
-            >
-              Cadastrar
-            </button>
-
-            <button
-              id="botao-limpar"
-              class="botao botao-secundario"
-              type="button"
-            >
-              Limpar
-            </button>
+            <button id="botao-salvar" class="botao botao-principal" type="submit">Cadastrar</button>
+            <button id="botao-limpar" class="botao botao-secundario" type="button">Limpar</button>
           </div>
         </form>
 
         <div class="acesso-troca">
-          <button
-            id="botao-ir-login"
-            class="link-botao"
-            type="button"
-          >
-            Já tem conta? Entrar
-          </button>
+          <button id="botao-ir-login" class="link-botao" type="button">Já tem conta? Entrar</button>
         </div>
       </section>
     </div>
@@ -374,49 +227,167 @@
       <article class="cartao">
         <span class="cartao-icone" aria-hidden="true">&#128176;</span>
         <h3>Economia</h3>
-        <p>
-          Um jeito mais barato de ter os seus próprios painéis solares.
-        </p>
+        <p>Um jeito mais barato de ter os seus próprios painéis solares.</p>
       </article>
 
       <article class="cartao">
         <span class="cartao-icone" aria-hidden="true">&#9889;</span>
         <h3>Retorno rápido</h3>
-        <p>
-          Retorno do investimento mais rápido do que o dos
-          nossos concorrentes.
-        </p>
+        <p>Retorno do investimento mais rápido do que o dos nossos concorrentes.</p>
       </article>
 
       <article class="cartao">
         <span class="cartao-icone" aria-hidden="true">&#127803;</span>
         <h3>Inspirado em girassóis</h3>
-        <p>
-          Um suporte com IA que deixa a placa sempre na posição ideal.
-        </p>
+        <p>Um suporte com IA que deixa a placa sempre na posição ideal.</p>
       </article>
     </section>
 
     <footer class="rodape" style="position: relative;">
       Solaris · Iluminando seu futuro
-
-      <button
-        type="button"
-        onclick="abrirSegredoSolaris()"
-        aria-label="Acesso secreto"
-        style="background: transparent; border: none; color: inherit; opacity: 0.45; font-size: 13px; cursor: pointer; margin-left: 8px; padding: 2px 4px; transition: opacity 0.25s;"
-        onmouseover="this.style.opacity='1'"
-        onmouseout="this.style.opacity='0.45'"
-      >
-        🌻
-      </button>
+      <button type="button" onclick="abrirSegredoSolaris()" aria-label="Acesso secreto" style="background: transparent; border: none; color: inherit; opacity: 0.45; font-size: 13px; cursor: pointer; margin-left: 8px; padding: 2px 4px; transition: opacity 0.25s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.45'">🌻</button>
     </footer>
   </main>
 
+  <!-- ======================================================= -->
+  <!-- JAVASCRIPT PARA CONECTAR AO BANCO DE DADOS -->
+  <!-- ======================================================= -->
   <script>
+    // --- LÓGICA DE ABRIR E FECHAR OS PAINÉIS ---
+    const botaoLogin = document.getElementById("botao-login");
+    const areaAcesso = document.getElementById("area-acesso");
+    const painelLogin = document.getElementById("painel-login");
+    const painelCadastro = document.getElementById("painel-cadastro");
+    const btnIrCadastro = document.getElementById("botao-ir-cadastro");
+    const btnIrLogin = document.getElementById("botao-ir-login");
+    const mensagemGlobal = document.getElementById("mensagem");
+
+    botaoLogin.addEventListener("click", () => {
+      const estaAberto = !areaAcesso.hidden;
+      areaAcesso.hidden = estaAberto;
+      botaoLogin.setAttribute("aria-expanded", !estaAberto);
+    });
+
+    btnIrCadastro.addEventListener("click", () => {
+      painelLogin.hidden = true;
+      painelCadastro.hidden = false;
+    });
+
+    btnIrLogin.addEventListener("click", () => {
+      painelCadastro.hidden = true;
+      painelLogin.hidden = false;
+    });
+
+    function mostrarMensagem(texto, tipo = "sucesso") {
+      mensagemGlobal.textContent = texto;
+      mensagemGlobal.className = "mensagem"; // Reseta classes
+      if (tipo === "erro") {
+        mensagemGlobal.classList.add("erro");
+      }
+      mensagemGlobal.hidden = false;
+      // Esconde após 5 segundos
+      setTimeout(() => { mensagemGlobal.hidden = true; }, 5000);
+    }
+
+    // --- URL DO SEU BACKEND FASTAPI ---
+    const URL_API = "http://127.0.0.1:8000";
+
+    // --- LÓGICA DE CADASTRO ---
+    document.getElementById("form-cadastro").addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      const botaoSalvar = document.getElementById("botao-salvar");
+      botaoSalvar.textContent = "Cadastrando...";
+      botaoSalvar.disabled = true;
+
+      // Monta o JSON exatamente como o Backend espera (models/clientes.py)
+      const dadosCliente = {
+        nome_cliente: document.getElementById("nome-cliente").value,
+        cpf_cliente: document.getElementById("cpf-cliente").value,
+        rg_cliente: document.getElementById("rg-cliente").value,
+        numero_cliente: document.getElementById("numero-cliente").value,
+        email_cliente: document.getElementById("email-cliente").value,
+        senha: document.getElementById("senha-cliente").value,
+        endereco_cliente: document.getElementById("endereco-cliente").value,
+        tipo_imovel_cliente: document.getElementById("tipo-imovel-cliente").value,
+        renda_mensal_cliente: parseFloat(document.getElementById("renda-cliente").value)
+      };
+
+      try {
+        const resposta = await fetch(`${URL_API}/clientes`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dadosCliente)
+        });
+
+        if (!resposta.ok) {
+          const erroDados = await resposta.json();
+          throw new Error(erroDados.detail || "Erro ao cadastrar cliente.");
+        }
+
+        mostrarMensagem("Cliente cadastrado com sucesso! Faça o login.", "sucesso");
+        
+        // Limpa o formulário e volta para a tela de login
+        document.getElementById("form-cadastro").reset();
+        painelCadastro.hidden = true;
+        painelLogin.hidden = false;
+
+      } catch (erro) {
+        mostrarMensagem(erro.message, "erro");
+      } finally {
+        botaoSalvar.textContent = "Cadastrar";
+        botaoSalvar.disabled = false;
+      }
+    });
+
+    // --- LÓGICA DE LOGIN ---
+    document.getElementById("form-login").addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      const botaoEntrar = document.getElementById("botao-entrar");
+      botaoEntrar.textContent = "Entrando...";
+      botaoEntrar.disabled = true;
+
+      const dadosLogin = {
+        email_cliente: document.getElementById("login-email").value,
+        senha: document.getElementById("login-senha").value
+      };
+
+      try {
+        const resposta = await fetch(`${URL_API}/clientes/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dadosLogin)
+        });
+
+        if (!resposta.ok) {
+          const erroDados = await resposta.json();
+          throw new Error(erroDados.detail || "E-mail ou senha incorretos.");
+        }
+
+        const dados = await resposta.json();
+        
+        // Salva o cliente no navegador (opcional, para usar na área logada)
+        localStorage.setItem("solaris_cliente", JSON.stringify(dados.cliente));
+
+        mostrarMensagem(`Bem-vindo(a), ${dados.cliente.nome_cliente}!`, "sucesso");
+        
+        // Redireciona para a página inicial após 2 segundos
+        setTimeout(() => {
+          window.location.href = "../../index.html";
+        }, 2000);
+
+      } catch (erro) {
+        mostrarMensagem(erro.message, "erro");
+      } finally {
+        botaoEntrar.textContent = "Entrar";
+        botaoEntrar.disabled = false;
+      }
+    });
+
+    // --- LÓGICA DO OVO DE PÁSCOA (EASTER EGG) ---
     function abrirSegredoSolaris() {
       const senha = prompt("Acesso restrito Solaris. Digite a senha:");
-
       if (senha === "67") {
         window.location.href = "easteregg.html";
       } else if (senha !== null) {
@@ -426,12 +397,10 @@
 
     let sunClicks = 0;
     const logoSun = document.getElementById("solaris-secret-sun");
-
     if (logoSun) {
       logoSun.addEventListener("click", (e) => {
         e.preventDefault();
         sunClicks++;
-
         if (sunClicks >= 3) {
           sunClicks = 0;
           abrirSegredoSolaris();
